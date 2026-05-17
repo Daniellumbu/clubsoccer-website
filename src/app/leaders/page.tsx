@@ -106,13 +106,21 @@ export default function LeadershipPage() {
                 <p className="text-sm text-gray-400 mt-1 leading-relaxed">{ROLE_DESCRIPTIONS[role]}</p>
               )}
             </div>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {grouped[role].map((entry) => (
-                <div key={entry.id} className="flex flex-col">
-                  <p className="font-semibold text-gray-900">{entry.name}</p>
-                  {entry.bio && (
-                    <p className="text-sm text-gray-500 mt-0.5">{entry.bio}</p>
+                <div key={entry.id} className="flex items-center gap-3">
+                  {entry.photoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={entry.photoUrl} alt={entry.name} className="w-12 h-12 rounded-full object-cover flex-shrink-0" />
+                  ) : (
+                    <span className="w-12 h-12 flex items-center justify-center rounded-full bg-carleton-blue text-carleton-maize font-bold flex-shrink-0">
+                      {entry.name.charAt(0)}
+                    </span>
                   )}
+                  <div>
+                    <p className="font-semibold text-gray-900">{entry.name}</p>
+                    {entry.bio && <p className="text-sm text-gray-500 mt-0.5">{entry.bio}</p>}
+                  </div>
                 </div>
               ))}
             </div>

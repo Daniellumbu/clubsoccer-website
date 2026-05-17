@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   getLeadership,
@@ -8,8 +8,10 @@ import {
   addLeadershipEntry,
   updateLeadershipEntry,
   deleteLeadershipEntry,
+  uploadLeaderPhoto,
   type LeadershipEntry,
 } from "@/lib/firebase";
+import { ImageCropper } from "@/components/ui/ImageCropper";
 
 const ROLES = [
   "Club President",
@@ -17,12 +19,12 @@ const ROLES = [
   "Club Treasurer",
   "Captain",
   "Social Captain",
-  "Freshman Liaison",
+  "Campus OutReach Manager",
 ];
 
 const ROLE_ORDER = ROLES;
 
-const emptyForm = { name: "", role: ROLES[0], season: "", bio: "" };
+const emptyForm = { name: "", role: ROLES[0], season: "", bio: "", photoUrl: "" };
 
 function roleIndex(role: string) {
   const i = ROLE_ORDER.indexOf(role);
@@ -36,11 +38,19 @@ export default function AdminLeadersPage() {
   const [selectedSeason, setSelectedSeason] = useState<string>("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState(emptyForm);
+  const [editImageBlob, setEditImageBlob] = useState<Blob | null>(null);
+  const [editPreview, setEditPreview] = useState<string>("");
   const [addForm, setAddForm] = useState(emptyForm);
+  const [addImageBlob, setAddImageBlob] = useState<Blob | null>(null);
+  const [addPreview, setAddPreview] = useState<string>("");
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+  const cropForRef = useRef<"add" | "edit">("add");
   const [showNewSeason, setShowNewSeason] = useState(false);
   const [newSeason, setNewSeason] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const addFileRef = useRef<HTMLInputElement>(null);
+  const editFileRef = useRef<HTMLInputElement>(null);
 
   async function load() {
     setLoading(true);
@@ -68,7 +78,27 @@ export default function AdminLeadersPage() {
 
   function startEdit(entry: LeadershipEntry) {
     setEditingId(entry.id);
-    setEditForm({ name: entry.name, role: entry.role, season: entry.season, bio: entry.bio ?? "" });
+    setEditForm({ name: entry.name, role: entry.role, season: entry.season, bio: entry.bio ?? "", photoUrl: entry.photoUrl ?? "" });
+    setEditImageBlob(null);
+    setEditPreview(entry.photoUrl ?? "");
+  }
+
+  function openCropper(file: File, target: "add" | "edit") {
+    cropForRef.current = target;
+    setCropSrc(URL.createObjectURL(file));
+  }
+
+  function handleCropDone(blob: Blob) {
+    const url = URL.createObjectURL(blob);
+    if (cropForRef.current === "add") { setAddImageBlob(blob); setAddPreview(url); }
+    else { setEditImageBlob(blob); setEditPreview(url); }
+    setCropSrc(null);
+  }
+
+  function handleCropCancel() {
+    if (cropForRef.current === "add" && addFileRef.current) addFileRef.current.value = "";
+    if (cropForRef.current === "edit" && editFileRef.current) editFileRef.current.value = "";
+    setCropSrc(null);
   }
 
   async function handleUpdate(e: React.FormEvent) {
@@ -77,10 +107,19 @@ export default function AdminLeadersPage() {
     setSaving(true);
     setError(null);
     try {
-      const data = { ...editForm };
-      if (!data.bio) delete (data as Partial<typeof data>).bio;
+      let photoUrl = editForm.photoUrl || undefined;
+      if (editImageBlob) photoUrl = await uploadLeaderPhoto(editImageBlob, "leader-photo.jpg");
+      const data: Omit<LeadershipEntry, "id"> = {
+        name: editForm.name,
+        role: editForm.role,
+        season: editForm.season,
+        bio: editForm.bio || undefined,
+        photoUrl,
+      };
       await updateLeadershipEntry(editingId, data);
       setEditingId(null);
+      setEditImageBlob(null);
+      setEditPreview("");
       await load();
     } catch (err: unknown) {
       setError((err as Error).message);
@@ -95,10 +134,20 @@ export default function AdminLeadersPage() {
     setSaving(true);
     setError(null);
     try {
-      const data = { ...addForm };
-      if (!data.bio) delete (data as Partial<typeof data>).bio;
+      let photoUrl: string | undefined;
+      if (addImageBlob) photoUrl = await uploadLeaderPhoto(addImageBlob, "leader-photo.jpg");
+      const data: Omit<LeadershipEntry, "id"> = {
+        name: addForm.name,
+        role: addForm.role,
+        season: addForm.season,
+        bio: addForm.bio || undefined,
+        photoUrl,
+      };
       await addLeadershipEntry(data);
       setAddForm({ ...emptyForm, season: selectedSeason, role: ROLES[0] });
+      setAddImageBlob(null);
+      setAddPreview("");
+      if (addFileRef.current) addFileRef.current.value = "";
       await load();
     } catch (err: unknown) {
       setError((err as Error).message);
@@ -131,6 +180,20 @@ export default function AdminLeadersPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      {saving && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[60]">
+          <div className="bg-white rounded-2xl px-8 py-6 shadow-xl flex flex-col items-center gap-4 min-w-[200px]">
+            <div className="flex items-center gap-3">
+              <div className="w-5 h-5 border-2 border-carleton-blue border-t-transparent rounded-full animate-spin" />
+              <p className="text-sm font-medium text-gray-700">Saving…</p>
+            </div>
+            <button onClick={() => setSaving(false)} className="text-xs text-gray-400 hover:text-gray-600 transition-colors">Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {cropSrc && <ImageCropper src={cropSrc} onDone={handleCropDone} onCancel={handleCropCancel} />}
+
       <Link href="/admin" className="text-sm text-gray-400 hover:text-carleton-blue transition-colors mb-6 inline-block">
         ← Admin
       </Link>
@@ -165,12 +228,8 @@ export default function AdminLeadersPage() {
             placeholder="2026-2027"
             className={inputCls + " flex-1"}
           />
-          <button type="submit" className="bg-carleton-blue text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">
-            Create
-          </button>
-          <button type="button" onClick={() => setShowNewSeason(false)} className="border border-gray-200 px-3 py-2 rounded-lg text-sm hover:bg-gray-100">
-            Cancel
-          </button>
+          <button type="submit" className="bg-carleton-blue text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">Create</button>
+          <button type="button" onClick={() => setShowNewSeason(false)} className="border border-gray-200 px-3 py-2 rounded-lg text-sm hover:bg-gray-100">Cancel</button>
         </form>
       )}
 
@@ -207,21 +266,43 @@ export default function AdminLeadersPage() {
                     <label className="block text-xs text-gray-500 mb-1">Bio (optional)</label>
                     <input value={editForm.bio} onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })} className={inputCls + " w-full"} placeholder="Short bio or note" />
                   </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Photo</label>
+                    <div className="flex items-center gap-3">
+                      {editPreview && <img src={editPreview} alt="preview" className="w-12 h-12 rounded-full object-cover flex-shrink-0" />}
+                      <input
+                        ref={editFileRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => { const f = e.target.files?.[0]; if (f) openCropper(f, "edit"); }}
+                        className="text-sm text-gray-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-carleton-blue file:text-white hover:file:opacity-90"
+                      />
+                    </div>
+                    {editPreview && (
+                      <button type="button" onClick={() => { setEditPreview(""); setEditImageBlob(null); setEditForm({ ...editForm, photoUrl: "" }); if (editFileRef.current) editFileRef.current.value = ""; }} className="mt-1 text-xs text-red-400 hover:text-red-600">
+                        Remove photo
+                      </button>
+                    )}
+                  </div>
                   <div className="flex gap-3">
-                    <button type="submit" disabled={saving} className="bg-carleton-blue text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity">
-                      {saving ? "Saving…" : "Save"}
-                    </button>
-                    <button type="button" onClick={() => setEditingId(null)} className="border border-gray-200 px-4 py-2 rounded-lg text-sm hover:bg-gray-100">
-                      Cancel
-                    </button>
+                    <button type="submit" disabled={saving} className="bg-carleton-blue text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50">Save</button>
+                    <button type="button" onClick={() => { setEditingId(null); setEditImageBlob(null); setEditPreview(""); }} className="border border-gray-200 px-4 py-2 rounded-lg text-sm hover:bg-gray-100">Cancel</button>
                   </div>
                 </form>
               ) : (
-                <div key={entry.id} className="flex items-center justify-between bg-white border border-gray-100 rounded-xl px-5 py-3 shadow-sm gap-4">
-                  <div className="min-w-0">
-                    <p className="font-semibold text-gray-900">{entry.name}</p>
-                    <p className="text-sm text-carleton-blue font-medium">{entry.role}</p>
-                    {entry.bio && <p className="text-xs text-gray-400 truncate">{entry.bio}</p>}
+                <div key={entry.id} className="flex items-center justify-between bg-white border border-gray-100 rounded-xl px-4 py-3 shadow-sm gap-4">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    {entry.photoUrl ? (
+                      <img src={entry.photoUrl} alt={entry.name} className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
+                    ) : (
+                      <span className="w-10 h-10 flex items-center justify-center rounded-full bg-carleton-blue text-carleton-maize font-bold text-sm flex-shrink-0">
+                        {entry.name.charAt(0)}
+                      </span>
+                    )}
+                    <div className="min-w-0">
+                      <p className="font-semibold text-gray-900">{entry.name}</p>
+                      <p className="text-xs text-carleton-blue font-medium uppercase tracking-wider">{entry.role}</p>
+                    </div>
                   </div>
                   <div className="flex items-center gap-3 flex-shrink-0">
                     <button onClick={() => startEdit(entry)} className="text-sm text-carleton-blue hover:opacity-70 transition-opacity">Edit</button>
@@ -251,8 +332,21 @@ export default function AdminLeadersPage() {
                 <label className="block text-xs text-gray-500 mb-1">Bio (optional)</label>
                 <input value={addForm.bio} onChange={(e) => setAddForm({ ...addForm, bio: e.target.value })} className={inputCls + " w-full"} placeholder="Short bio or note" />
               </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Photo</label>
+                <div className="flex items-center gap-3">
+                  {addPreview && <img src={addPreview} alt="preview" className="w-12 h-12 rounded-full object-cover flex-shrink-0" />}
+                  <input
+                    ref={addFileRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => { const f = e.target.files?.[0]; if (f) openCropper(f, "add"); }}
+                    className="text-sm text-gray-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-carleton-blue file:text-white hover:file:opacity-90"
+                  />
+                </div>
+              </div>
               <button type="submit" disabled={saving || !selectedSeason} className="bg-carleton-blue text-white px-5 py-2 rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity">
-                {saving ? "Adding…" : "Add Member"}
+                Add Member
               </button>
             </form>
           </div>

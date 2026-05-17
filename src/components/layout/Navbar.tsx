@@ -13,6 +13,7 @@ const navLinks = [
   { href: "/leaders", label: "Leadership" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact Us" },
+  { href: "/donate", label: "Donate", highlight: true },
 ];
 
 export function Navbar() {
@@ -40,16 +41,25 @@ export function Navbar() {
 
         {/* Desktop nav */}
         <ul className="hidden md:flex items-center gap-6 text-sm font-medium">
-          {navLinks.map(({ href, label }) => (
+          {navLinks.map(({ href, label, highlight }) => (
             <li key={href}>
-              <Link
-                href={href}
-                className={`hover:text-carleton-maize transition-colors ${
-                  pathname === href ? "text-carleton-maize" : "text-blue-200"
-                }`}
-              >
-                {label}
-              </Link>
+              {highlight ? (
+                <Link
+                  href={href}
+                  className="bg-carleton-maize text-carleton-blue px-3 py-1.5 rounded-full font-semibold hover:opacity-90 transition-opacity"
+                >
+                  {label}
+                </Link>
+              ) : (
+                <Link
+                  href={href}
+                  className={`hover:text-carleton-maize transition-colors ${
+                    pathname === href ? "text-carleton-maize" : "text-blue-200"
+                  }`}
+                >
+                  {label}
+                </Link>
+              )}
             </li>
           ))}
         </ul>
@@ -92,13 +102,15 @@ export function Navbar() {
       {mobileOpen && (
         <div className="md:hidden bg-carleton-blue border-t border-blue-800 px-4 pb-4">
           <ul className="flex flex-col gap-1 pt-2">
-            {navLinks.map(({ href, label }) => (
+            {navLinks.map(({ href, label, highlight }) => (
               <li key={href}>
                 <Link
                   href={href}
                   onClick={() => setMobileOpen(false)}
                   className={`block px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                    pathname === href
+                    highlight
+                      ? "text-carleton-blue bg-carleton-maize font-semibold"
+                      : pathname === href
                       ? "text-carleton-maize bg-white/10"
                       : "text-blue-200 hover:text-white hover:bg-white/10"
                   }`}
