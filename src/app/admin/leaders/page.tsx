@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   getLeadership,
-  getLeadershipSeasons,
   addLeadershipEntry,
   updateLeadershipEntry,
   deleteLeadershipEntry,
@@ -19,17 +18,16 @@ const ROLES = [
   "Club Treasurer",
   "Captain",
   "Social Captain",
+  "Freshman Liaison",
   "Campus OutReach Manager",
 ];
 
-const ROLE_ORDER = ROLES;
+function roleIndex(role: string) {
+  const i = ROLES.indexOf(role);
+  return i === -1 ? ROLES.length : i;
+}
 
 const emptyForm = { name: "", role: ROLES[0], season: "", bio: "", photoUrl: "" };
-
-function roleIndex(role: string) {
-  const i = ROLE_ORDER.indexOf(role);
-  return i === -1 ? ROLE_ORDER.length : i;
-}
 
 export default function AdminLeadersPage() {
   const [seasons, setSeasons] = useState<string[]>([]);
@@ -54,14 +52,21 @@ export default function AdminLeadersPage() {
 
   async function load() {
     setLoading(true);
-    const [s, all] = await Promise.all([getLeadershipSeasons(), getLeadership()]);
-    setSeasons(s);
-    setEntries(all);
-    if (s.length > 0 && !selectedSeason) {
-      setSelectedSeason(s[0]);
-      setAddForm((f) => ({ ...f, season: s[0] }));
+    setError(null);
+    try {
+      const all = await getLeadership();
+      const derivedSeasons = [...new Set(all.map((e) => e.season))];
+      setEntries(all);
+      setSeasons(derivedSeasons);
+      if (derivedSeasons.length > 0 && !selectedSeason) {
+        setSelectedSeason(derivedSeasons[0]);
+        setAddForm((f) => ({ ...f, season: derivedSeasons[0] }));
+      }
+    } catch (err: unknown) {
+      setError((err as Error).message);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -89,13 +94,23 @@ export default function AdminLeadersPage() {
   }
 
   function handleCropDone(blob: Blob) {
+    // Revoke previous object URL before replacing
+    if (cropSrc) URL.revokeObjectURL(cropSrc);
     const url = URL.createObjectURL(blob);
-    if (cropForRef.current === "add") { setAddImageBlob(blob); setAddPreview(url); }
-    else { setEditImageBlob(blob); setEditPreview(url); }
+    if (cropForRef.current === "add") {
+      if (addPreview.startsWith("blob:")) URL.revokeObjectURL(addPreview);
+      setAddImageBlob(blob);
+      setAddPreview(url);
+    } else {
+      if (editPreview.startsWith("blob:")) URL.revokeObjectURL(editPreview);
+      setEditImageBlob(blob);
+      setEditPreview(url);
+    }
     setCropSrc(null);
   }
 
   function handleCropCancel() {
+    if (cropSrc) URL.revokeObjectURL(cropSrc);
     if (cropForRef.current === "add" && addFileRef.current) addFileRef.current.value = "";
     if (cropForRef.current === "edit" && editFileRef.current) editFileRef.current.value = "";
     setCropSrc(null);
@@ -166,11 +181,14 @@ export default function AdminLeadersPage() {
     }
   }
 
-  async function handleCreateSeason(e: React.FormEvent) {
+  // Seasons for leadership are derived from existing entries — there's no separate
+  // season document. "Creating" a season here just pre-selects the label so the
+  // first entry can be added; it won't appear on reload until an entry is saved.
+  function handleCreateSeason(e: React.FormEvent) {
     e.preventDefault();
     if (!newSeason.trim()) return;
     const s = newSeason.trim();
-    setSeasons((prev) => [s, ...prev]);
+    setSeasons((prev) => (prev.includes(s) ? prev : [s, ...prev]));
     switchSeason(s);
     setNewSeason("");
     setShowNewSeason(false);
@@ -187,7 +205,6 @@ export default function AdminLeadersPage() {
               <div className="w-5 h-5 border-2 border-carleton-blue border-t-transparent rounded-full animate-spin" />
               <p className="text-sm font-medium text-gray-700">Saving…</p>
             </div>
-            <button onClick={() => setSaving(false)} className="text-xs text-gray-400 hover:text-gray-600 transition-colors">Cancel</button>
           </div>
         </div>
       )}
@@ -220,16 +237,19 @@ export default function AdminLeadersPage() {
       </div>
 
       {showNewSeason && (
-        <form onSubmit={handleCreateSeason} className="flex gap-3 mb-6 bg-gray-50 border border-gray-200 rounded-xl p-4">
-          <input
-            required
-            value={newSeason}
-            onChange={(e) => setNewSeason(e.target.value)}
-            placeholder="2026-2027"
-            className={inputCls + " flex-1"}
-          />
-          <button type="submit" className="bg-carleton-blue text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">Create</button>
-          <button type="button" onClick={() => setShowNewSeason(false)} className="border border-gray-200 px-3 py-2 rounded-lg text-sm hover:bg-gray-100">Cancel</button>
+        <form onSubmit={handleCreateSeason} className="flex flex-col gap-2 mb-6 bg-gray-50 border border-gray-200 rounded-xl p-4">
+          <div className="flex gap-3">
+            <input
+              required
+              value={newSeason}
+              onChange={(e) => setNewSeason(e.target.value)}
+              placeholder="2026-2027"
+              className={inputCls + " flex-1"}
+            />
+            <button type="submit" className="bg-carleton-blue text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">Select</button>
+            <button type="button" onClick={() => setShowNewSeason(false)} className="border border-gray-200 px-3 py-2 rounded-lg text-sm hover:bg-gray-100">Cancel</button>
+          </div>
+          <p className="text-xs text-gray-400">The season will be saved automatically when you add the first member.</p>
         </form>
       )}
 

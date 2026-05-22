@@ -6,7 +6,6 @@ import {
   getDoc,
   query,
   orderBy,
-  where,
   limit,
   setDoc,
   addDoc,
@@ -87,13 +86,6 @@ export interface LeadershipEntry {
 
 // --- Read helpers ---
 
-export async function getCoach(): Promise<Coach | null> {
-  const snap = await getDocs(query(collection(db, "coaches"), limit(1)));
-  if (snap.empty) return null;
-  const d = snap.docs[0];
-  return { id: d.id, ...d.data() } as Coach;
-}
-
 export async function getCoaches(): Promise<Coach[]> {
   const snap = await getDocs(query(collection(db, "coaches"), orderBy("name")));
   return snap.docs.map((d) => ({ id: d.id, ...d.data() } as Coach));
@@ -106,14 +98,13 @@ export async function getSchedules(): Promise<Schedule[]> {
 
 export async function getNextMatch(): Promise<ScheduleGame | null> {
   const today = new Date().toISOString().split("T")[0];
-  const snap = await getDocs(query(collection(db, "schedules"), orderBy("season", "desc")));
+  // Only scan the most recent season to avoid loading all historical data.
+  const snap = await getDocs(
+    query(collection(db, "schedules"), orderBy("season", "desc"), limit(1))
+  );
   if (snap.empty) return null;
-  const allGames: ScheduleGame[] = [];
-  snap.docs.forEach((d) => {
-    const s = d.data() as Omit<Schedule, "id">;
-    allGames.push(...s.games);
-  });
-  const upcoming = allGames
+  const games = (snap.docs[0].data() as Omit<Schedule, "id">).games;
+  const upcoming = games
     .filter((g) => g.date >= today)
     .sort((a, b) => a.date.localeCompare(b.date));
   return upcoming[0] ?? null;
@@ -124,15 +115,10 @@ export async function getRosters(): Promise<Roster[]> {
   return snap.docs.map((d) => ({ id: d.id, ...d.data() } as Roster));
 }
 
-export async function getLeadership(season?: string): Promise<LeadershipEntry[]> {
+/** Returns all leadership entries ordered by season descending. Derive seasons via [...new Set(entries.map(e => e.season))]. */
+export async function getLeadership(): Promise<LeadershipEntry[]> {
   const snap = await getDocs(query(collection(db, "leadership"), orderBy("season", "desc")));
-  const all = snap.docs.map((d) => ({ id: d.id, ...d.data() } as LeadershipEntry));
-  return season ? all.filter((e) => e.season === season) : all;
-}
-
-export async function getLeadershipSeasons(): Promise<string[]> {
-  const snap = await getDocs(query(collection(db, "leadership"), orderBy("season", "desc")));
-  return [...new Set(snap.docs.map((d) => (d.data() as LeadershipEntry).season))];
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() } as LeadershipEntry));
 }
 
 // --- Write helpers: Coach ---
@@ -142,8 +128,8 @@ export async function saveCoach(id: string | null, data: Omit<Coach, "id">): Pro
     await setDoc(doc(db, "coaches", id), data);
     return id;
   }
-  const ref = await addDoc(collection(db, "coaches"), data);
-  return ref.id;
+  const docRef = await addDoc(collection(db, "coaches"), data);
+  return docRef.id;
 }
 
 export async function deleteCoach(id: string): Promise<void> {
@@ -153,8 +139,8 @@ export async function deleteCoach(id: string): Promise<void> {
 // --- Write helpers: Schedule (season-based) ---
 
 export async function createScheduleSeason(season: string): Promise<string> {
-  const ref = await addDoc(collection(db, "schedules"), { season, games: [] });
-  return ref.id;
+  const docRef = await addDoc(collection(db, "schedules"), { season, games: [] });
+  return docRef.id;
 }
 
 export async function deleteScheduleSeason(scheduleId: string): Promise<void> {
@@ -195,8 +181,8 @@ function stripUndefined<T extends object>(obj: T): T {
 // --- Write helpers: Roster / Players ---
 
 export async function createSeason(season: string): Promise<string> {
-  const ref = await addDoc(collection(db, "rosters"), { season, players: [] });
-  return ref.id;
+  const docRef = await addDoc(collection(db, "rosters"), { season, players: [] });
+  return docRef.id;
 }
 
 export async function addPlayerToRoster(
@@ -242,41 +228,11 @@ export async function deleteRoster(rosterId: string): Promise<void> {
   await deleteDoc(doc(db, "rosters", rosterId));
 }
 
-export async function uploadCoachPhoto(file: File | Blob, fileName = "photo.jpg"): Promise<string> {
-  const name = file instanceof File ? file.name : fileName;
-  const storageRef = ref(storage, `coaches/${Date.now()}-${name}`);
-  const upload = uploadBytes(storageRef, file).then(() => getDownloadURL(storageRef));
-  const timeout = new Promise<never>((_, reject) =>
-    setTimeout(() => reject(new Error("Upload timed out. Check Firebase Storage configuration.")), 15000)
-  );
-  return Promise.race([upload, timeout]);
-}
-
-export async function uploadLeaderPhoto(file: File | Blob, fileName = "photo.jpg"): Promise<string> {
-  const name = file instanceof File ? file.name : fileName;
-  const storageRef = ref(storage, `leaders/${Date.now()}-${name}`);
-  const upload = uploadBytes(storageRef, file).then(() => getDownloadURL(storageRef));
-  const timeout = new Promise<never>((_, reject) =>
-    setTimeout(() => reject(new Error("Upload timed out. Check Firebase Storage configuration.")), 15000)
-  );
-  return Promise.race([upload, timeout]);
-}
-
-export async function uploadPlayerImage(file: File | Blob, rosterId: string, fileName = "photo.jpg"): Promise<string> {
-  const name = file instanceof File ? file.name : fileName;
-  const storageRef = ref(storage, `players/${rosterId}/${Date.now()}-${name}`);
-  const upload = uploadBytes(storageRef, file).then(() => getDownloadURL(storageRef));
-  const timeout = new Promise<never>((_, reject) =>
-    setTimeout(() => reject(new Error("Image upload timed out. Make sure Firebase Storage is enabled in your project and the security rules allow writes.")), 15000)
-  );
-  return Promise.race([upload, timeout]);
-}
-
 export async function importRoster(fromRosterId: string, toSeason: string): Promise<string> {
   const snap = await getDoc(doc(db, "rosters", fromRosterId));
   if (!snap.exists()) throw new Error("Source roster not found");
   const sourceRoster = snap.data() as Omit<Roster, "id">;
-  // Drop year-4 players (graduating) and increment everyone else's year by 1
+  // Drop Year-4 seniors (graduating) and increment everyone else's year by 1
   const filteredPlayers = sourceRoster.players
     .filter((p: Player) => !p.year || p.year < 4)
     .map((p: Player, i: number) => ({
@@ -286,6 +242,31 @@ export async function importRoster(fromRosterId: string, toSeason: string): Prom
     }));
   const docRef = await addDoc(collection(db, "rosters"), { season: toSeason, players: filteredPlayers });
   return docRef.id;
+}
+
+// --- Upload helpers ---
+
+// 15-second timeout guards against misconfigured Storage rules or network hangs.
+async function uploadPhoto(file: File | Blob, storagePath: string, fileName = "photo.jpg"): Promise<string> {
+  const name = file instanceof File ? file.name : fileName;
+  const storageRef = ref(storage, `${storagePath}/${Date.now()}-${name}`);
+  const upload = uploadBytes(storageRef, file).then(() => getDownloadURL(storageRef));
+  const timeout = new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error("Upload timed out. Check Firebase Storage configuration.")), 15000)
+  );
+  return Promise.race([upload, timeout]);
+}
+
+export function uploadCoachPhoto(file: File | Blob, fileName = "photo.jpg"): Promise<string> {
+  return uploadPhoto(file, "coaches", fileName);
+}
+
+export function uploadLeaderPhoto(file: File | Blob, fileName = "photo.jpg"): Promise<string> {
+  return uploadPhoto(file, "leaders", fileName);
+}
+
+export function uploadPlayerImage(file: File | Blob, rosterId: string, fileName = "photo.jpg"): Promise<string> {
+  return uploadPhoto(file, `players/${rosterId}`, fileName);
 }
 
 // --- Write helpers: Leadership ---

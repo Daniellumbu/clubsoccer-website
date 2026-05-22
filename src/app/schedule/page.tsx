@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import { getSchedules, type Schedule } from "@/lib/firebase";
 import { MatchRow } from "@/components/ui/MatchRow";
 
+const today = new Date().toISOString().split("T")[0];
+
 export default function SchedulePage() {
   const [schedules, setSchedules] = useState<Schedule[] | undefined>(undefined);
   const [selectedId, setSelectedId] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const today = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
     getSchedules()

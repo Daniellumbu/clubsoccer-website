@@ -36,8 +36,8 @@ export function MatchRow({ game }: MatchRowProps) {
               />
             </div>
           ) : (
-            <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 text-xs font-bold">
-              ?
+            <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-full bg-gray-200 text-gray-600 text-sm font-bold">
+              {game.opponent.charAt(0).toUpperCase()}
             </div>
           )}
           <div>

@@ -175,10 +175,16 @@ export default function AdminSchedulePage() {
 
   async function load() {
     setLoading(true);
-    const data = await getSchedules();
-    setSchedules(data);
-    if (data.length > 0 && !selectedId) setSelectedId(data[0].id);
-    setLoading(false);
+    setError(null);
+    try {
+      const data = await getSchedules();
+      setSchedules(data);
+      if (data.length > 0 && !selectedId) setSelectedId(data[0].id);
+    } catch (err: unknown) {
+      setError((err as Error).message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -337,8 +343,8 @@ export default function AdminSchedulePage() {
         <>
           <div className="space-y-3 mb-6">
             {games.length === 0 && <p className="text-gray-400 text-sm">No games yet. Add one below.</p>}
-            {games.map((game) =>
-              editingId === game.id ? (
+            {games.map((game) => {
+              if (editingId === game.id) return (
                 <GameForm
                   key={game.id}
                   form={editForm}
@@ -349,18 +355,17 @@ export default function AdminSchedulePage() {
                   saving={saving}
                   error={error}
                 />
-              ) : (
+              );
+              const school = findSchool(game.opponent);
+              return (
                 <div key={game.id} className="flex items-center justify-between bg-white border border-gray-100 rounded-xl px-5 py-3 shadow-sm gap-4">
                   <div className="flex items-center gap-4 min-w-0">
                     <span className="text-sm text-gray-400 flex-shrink-0">{formatDate(game.date)}</span>
                     <div className="flex items-center gap-2 min-w-0">
-                      {(() => {
-                        const s = findSchool(game.opponent);
-                        return s ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={s.logo} alt={s.name} className="w-7 h-7 object-contain flex-shrink-0" />
-                        ) : null;
-                      })()}
+                      {school && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={school.logo} alt={school.name} className="w-7 h-7 object-contain flex-shrink-0" />
+                      )}
                       <div className="min-w-0">
                         <p className="font-medium text-gray-900 truncate">vs. {game.opponent}</p>
                         <p className="text-xs text-gray-400 truncate">{game.location}</p>
@@ -376,8 +381,8 @@ export default function AdminSchedulePage() {
                     <button onClick={() => handleDelete(game.id, game.opponent)} className="text-sm text-red-400 hover:text-red-600 transition-colors">✕</button>
                   </div>
                 </div>
-              )
-            )}
+              );
+            })}
           </div>
 
           {showAdd ? (

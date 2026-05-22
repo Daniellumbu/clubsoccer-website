@@ -33,9 +33,15 @@ export default function AdminCoachPage() {
 
   async function load() {
     setLoading(true);
-    const data = await getCoaches();
-    setCoaches(data);
-    setLoading(false);
+    setError(null);
+    try {
+      const data = await getCoaches();
+      setCoaches(data);
+    } catch (err: unknown) {
+      setError((err as Error).message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -53,13 +59,22 @@ export default function AdminCoachPage() {
   }
 
   function handleCropDone(blob: Blob) {
+    if (cropSrc) URL.revokeObjectURL(cropSrc);
     const url = URL.createObjectURL(blob);
-    if (cropForRef.current === "add") { setAddImageBlob(blob); setAddPreview(url); }
-    else { setEditImageBlob(blob); setEditPreview(url); }
+    if (cropForRef.current === "add") {
+      if (addPreview.startsWith("blob:")) URL.revokeObjectURL(addPreview);
+      setAddImageBlob(blob);
+      setAddPreview(url);
+    } else {
+      if (editPreview.startsWith("blob:")) URL.revokeObjectURL(editPreview);
+      setEditImageBlob(blob);
+      setEditPreview(url);
+    }
     setCropSrc(null);
   }
 
   function handleCropCancel() {
+    if (cropSrc) URL.revokeObjectURL(cropSrc);
     if (cropForRef.current === "add" && addFileRef.current) addFileRef.current.value = "";
     if (cropForRef.current === "edit" && editFileRef.current) editFileRef.current.value = "";
     setCropSrc(null);
@@ -128,8 +143,7 @@ export default function AdminCoachPage() {
               <div className="w-5 h-5 border-2 border-carleton-blue border-t-transparent rounded-full animate-spin" />
               <p className="text-sm font-medium text-gray-700">Saving…</p>
             </div>
-            <button onClick={() => setSaving(false)} className="text-xs text-gray-400 hover:text-gray-600 transition-colors">Cancel</button>
-          </div>
+            </div>
         </div>
       )}
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getLeadership, getLeadershipSeasons, type LeadershipEntry } from "@/lib/firebase";
+import { getLeadership, type LeadershipEntry } from "@/lib/firebase";
 
 const ROLE_ORDER = [
   "Club President",
@@ -10,6 +10,7 @@ const ROLE_ORDER = [
   "Captain",
   "Social Captain",
   "Freshman Liaison",
+  "Campus OutReach Manager",
 ];
 
 const ROLE_DESCRIPTIONS: Record<string, string> = {
@@ -19,6 +20,7 @@ const ROLE_DESCRIPTIONS: Record<string, string> = {
   "Captain": "Helps with scheduling games and finalizing game rosters. Runs practice and coordinates with Social Captains to keep camaraderie high.",
   "Social Captain": "Plans team social events, builds team culture, and keeps morale strong on and off the field.",
   "Freshman Liaison": "Bridges new members with the rest of the club and helps freshmen feel at home.",
+  "Campus OutReach Manager": "Promotes the club across campus and coordinates recruitment and community engagement.",
 };
 
 function roleIndex(role: string) {
@@ -27,18 +29,18 @@ function roleIndex(role: string) {
 }
 
 export default function LeadershipPage() {
-  const [seasons, setSeasons] = useState<string[]>([]);
   const [entries, setEntries] = useState<LeadershipEntry[]>([]);
   const [selectedSeason, setSelectedSeason] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([getLeadershipSeasons(), getLeadership()])
-      .then(([s, all]) => {
-        setSeasons(s);
+    getLeadership()
+      .then((all) => {
         setEntries(all);
-        if (s.length > 0) setSelectedSeason(s[0]);
+        // Seasons are ordered desc by the query — pick the first unique one as default
+        const first = all[0]?.season;
+        if (first) setSelectedSeason(first);
       })
       .catch((err) => {
         console.error("[leadership]", err);
@@ -46,6 +48,9 @@ export default function LeadershipPage() {
       })
       .finally(() => setLoading(false));
   }, []);
+
+  // Derive the unique ordered season list from entries (entries are already season-desc ordered)
+  const seasons = [...new Set(entries.map((e) => e.season))];
 
   const visible = entries
     .filter((e) => e.season === selectedSeason)
@@ -56,7 +61,6 @@ export default function LeadershipPage() {
   for (const entry of visible) {
     (grouped[entry.role] ??= []).push(entry);
   }
-
   const orderedRoles = Object.keys(grouped).sort((a, b) => roleIndex(a) - roleIndex(b));
 
   return (
