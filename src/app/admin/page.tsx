@@ -5,6 +5,7 @@ const sections = [
   { href: "/admin/schedule", label: "Schedule", description: "Add, edit, and remove games" },
   { href: "/admin/roster",   label: "Roster",   description: "Manage players by season" },
   { href: "/admin/leaders",  label: "Leaders",  description: "Update scoring leaderboard" },
+  { href: "/admin/about",    label: "About",    description: "Edit the About Us page content" },
 ];
 
 export default function AdminPage() {

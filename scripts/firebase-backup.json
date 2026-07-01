@@ -1,0 +1,558 @@
+{
+  "coaches": [
+    {
+      "id": "coach-1",
+      "name": "Zach ",
+      "bio": "15 years coaching experience. Former semi-professional player and UEFA B license holder. Joined Carleton in 2019.",
+      "role": "Head Coach"
+    }
+  ],
+  "schedules": [
+    {
+      "id": "D7iZdry3IpUv8213XLsA",
+      "season": "2026-2027",
+      "games": [
+        {
+          "opponent": "Wisconsin River Way",
+          "location": "Carleton Fields, Northfield MN",
+          "date": "2026-09-01",
+          "isHome": true,
+          "id": "g-1779067838124"
+        },
+        {
+          "id": "g-1779478267323",
+          "location": "Carleton Fields, Northfield MN",
+          "isHome": true,
+          "date": "2026-06-17",
+          "opponent": "Gustavus Adolphus College"
+        }
+      ]
+    },
+    {
+      "id": "hVCOUQ1EqdGoU7lmeSLe",
+      "games": [
+        {
+          "result": "L 5-1",
+          "id": "g-1779067513406",
+          "date": "2026-04-04",
+          "opponent": "UW-River Falls",
+          "location": "313 E Johnson St, River Falls, WI 54022",
+          "isHome": false
+        },
+        {
+          "result": "W 3-2",
+          "id": "g-1779067549015",
+          "opponent": "St. Olaf College",
+          "location": "Carleton Fields, Northfield MN",
+          "isHome": true,
+          "date": "2026-04-10"
+        },
+        {
+          "opponent": "Gustavus Adolphus College",
+          "isHome": false,
+          "date": "2026-04-26",
+          "location": "Gustavus Adolphus College, St. Peter MN",
+          "id": "g-1779067589323",
+          "result": "L 3-2"
+        },
+        {
+          "isHome": true,
+          "date": "2026-05-01",
+          "location": "Carleton Fields, Northfield MN",
+          "opponent": "Macalester College ",
+          "id": "g-1779067602257",
+          "result": "T 2-2"
+        },
+        {
+          "opponent": "Minnesota State University, Mankato",
+          "location": "799 Ellis Ave, Mankato, MN 56001",
+          "isHome": false,
+          "date": "2026-04-18",
+          "id": "g-1779067770628",
+          "result": "Canceled"
+        },
+        {
+          "result": "W 3-2",
+          "id": "g-1779067792706",
+          "isHome": false,
+          "location": "St. Olaf College, Northfield MN",
+          "opponent": "St. Olaf College",
+          "date": "2026-05-10"
+        }
+      ],
+      "season": "2025-2026"
+    }
+  ],
+  "rosters": [
+    {
+      "id": "oyNbnsdh5HUCudfr3j91",
+      "season": "2025-2026",
+      "players": [
+        {
+          "id": "p-1779066559839-0",
+          "year": 2,
+          "number": 1,
+          "position": "GK",
+          "name": "Quinn Baudenbacher"
+        },
+        {
+          "id": "p-1779066559839-1",
+          "year": 1,
+          "position": "GK",
+          "number": 33,
+          "name": "Dester Selby-Salazar"
+        },
+        {
+          "id": "p-1779066559839-2",
+          "year": 1,
+          "number": 99,
+          "position": "GK",
+          "name": "Gabriel Vessey"
+        },
+        {
+          "id": "p-1779066559839-3",
+          "year": 1,
+          "number": 2,
+          "position": "DEF",
+          "name": "Bryson Gibbs"
+        },
+        {
+          "id": "p-1779066559839-4",
+          "year": 1,
+          "number": 6,
+          "position": "DEF",
+          "name": "Jacob Longoni"
+        },
+        {
+          "name": "Nick Foley",
+          "number": 5,
+          "position": "MID",
+          "year": 2,
+          "id": "p-1779066559839-5"
+        },
+        {
+          "name": "Nacho Obando",
+          "position": "MID",
+          "number": 8,
+          "year": 2,
+          "id": "p-1779066559839-6"
+        },
+        {
+          "year": 1,
+          "id": "p-1779066559839-7",
+          "name": "Zain Bhalla",
+          "number": 3,
+          "position": "DEF"
+        },
+        {
+          "year": 2,
+          "id": "p-1779066559839-8",
+          "name": "Shiv Antar Khalsa",
+          "number": 7,
+          "position": "MID"
+        },
+        {
+          "year": 1,
+          "id": "p-1779066559839-9",
+          "name": "Xavier Wigglesworth",
+          "position": "FWD",
+          "number": 9
+        },
+        {
+          "year": 1,
+          "id": "p-1779066559839-10",
+          "name": "Theo Thomason",
+          "number": 12,
+          "position": "MID"
+        },
+        {
+          "year": 2,
+          "id": "p-1779066559839-11",
+          "name": "Saul Zis",
+          "number": 11,
+          "position": "MID"
+        },
+        {
+          "name": "Sebastian Vargas Hipple",
+          "number": 15,
+          "position": "FWD",
+          "year": 1,
+          "id": "p-1779066559839-12"
+        },
+        {
+          "number": 14,
+          "position": "DEF",
+          "name": "Anderson Skarstad",
+          "id": "p-1779066559839-13",
+          "year": 1
+        },
+        {
+          "position": "FWD",
+          "number": 16,
+          "name": "Ambrose Cornelius",
+          "id": "p-1779066559839-14",
+          "year": 1
+        },
+        {
+          "year": 2,
+          "id": "p-1779066559839-15",
+          "name": "Patrick Moran",
+          "position": "DEF",
+          "number": 18
+        },
+        {
+          "number": 19,
+          "position": "FWD",
+          "name": "Oscar Peche",
+          "id": "p-1779066559839-16",
+          "year": 1
+        },
+        {
+          "year": 1,
+          "id": "p-1779066559839-17",
+          "name": "Sebastian Clemente",
+          "position": "MID",
+          "number": 20
+        },
+        {
+          "position": "DEF",
+          "number": 28,
+          "name": "Edward Marotta",
+          "id": "p-1779066705739",
+          "year": 3
+        },
+        {
+          "name": "Ira Bradie",
+          "number": 4,
+          "position": "DEF",
+          "year": 3,
+          "id": "p-1779066866965"
+        },
+        {
+          "name": "Rafael Washburn",
+          "position": "FWD",
+          "number": 10,
+          "year": 3,
+          "id": "p-1779066887873"
+        },
+        {
+          "name": "Daniel Lumbu",
+          "position": "MID",
+          "number": 17,
+          "year": 4,
+          "id": "p-1779066905117"
+        },
+        {
+          "year": 3,
+          "id": "p-1779066922728",
+          "name": "Roan Arendtsz",
+          "number": 21,
+          "position": "FWD"
+        },
+        {
+          "number": 13,
+          "position": "DEF",
+          "name": "Charlie Cullen",
+          "id": "p-1779066995829",
+          "year": 3
+        },
+        {
+          "id": "p-1779067058173",
+          "year": 4,
+          "position": "MID",
+          "number": 22,
+          "name": "Daniel Yan"
+        },
+        {
+          "position": "FWD",
+          "number": 23,
+          "name": "Owen Berg",
+          "id": "p-1779067067939",
+          "year": 4
+        },
+        {
+          "name": "Max Kingston",
+          "position": "FWD",
+          "number": 24,
+          "year": 4,
+          "id": "p-1779067130649"
+        },
+        {
+          "year": 4,
+          "id": "p-1779067152309",
+          "name": "Luca Monte Araujo",
+          "position": "MID",
+          "number": 25
+        },
+        {
+          "number": 26,
+          "position": "FWD",
+          "name": "Jesse Blossom",
+          "id": "p-1779067282778",
+          "year": 1
+        }
+      ]
+    },
+    {
+      "id": "qfGZRGj0CDccWnIToLyt",
+      "players": [
+        {
+          "position": "GK",
+          "number": 1,
+          "name": "Quinn Baudenbacher",
+          "id": "p-1779064270160",
+          "year": 3
+        },
+        {
+          "name": "Dester Selby-Salazar",
+          "position": "GK",
+          "number": 33,
+          "year": 2,
+          "id": "p-1779064407452"
+        },
+        {
+          "year": 2,
+          "id": "p-1779064454834",
+          "name": "Gabriel Vessey",
+          "number": 99,
+          "position": "GK"
+        },
+        {
+          "year": 2,
+          "id": "p-1779064495611",
+          "name": "Bryson Gibbs",
+          "position": "DEF",
+          "number": 2
+        },
+        {
+          "year": 2,
+          "id": "p-1779064536858",
+          "name": "Jacob Longoni",
+          "number": 6,
+          "position": "DEF"
+        },
+        {
+          "year": 4,
+          "id": "p-1779064550646",
+          "name": "Ira Bradie",
+          "position": "DEF",
+          "number": 4
+        },
+        {
+          "year": 3,
+          "id": "p-1779064580016",
+          "name": "Nick Foley",
+          "position": "MID",
+          "number": 5
+        },
+        {
+          "name": "Nacho Obando",
+          "number": 8,
+          "position": "MID",
+          "year": 3,
+          "id": "p-1779064890362"
+        },
+        {
+          "year": 2,
+          "id": "p-1779064905632",
+          "name": "Zain Bhalla",
+          "position": "DEF",
+          "number": 3
+        },
+        {
+          "position": "MID",
+          "number": 7,
+          "name": "Shiv Antar Khalsa",
+          "id": "p-1779064947028",
+          "year": 3
+        },
+        {
+          "id": "p-1779064986363",
+          "year": 2,
+          "position": "FWD",
+          "number": 9,
+          "name": "Xavier Wigglesworth"
+        },
+        {
+          "id": "p-1779065085289",
+          "year": 2,
+          "position": "MID",
+          "number": 12,
+          "name": "Theo Thomason"
+        },
+        {
+          "number": 11,
+          "position": "MID",
+          "name": "Saul Zis",
+          "id": "p-1779065113572",
+          "year": 3
+        },
+        {
+          "year": 2,
+          "id": "p-1779065200636",
+          "name": "Sebastian Vargas Hipple",
+          "position": "FWD",
+          "number": 15
+        },
+        {
+          "name": "Charlie Cullen",
+          "number": 13,
+          "position": "DEF",
+          "year": 4,
+          "id": "p-1779066083750"
+        },
+        {
+          "id": "p-1779066118579",
+          "year": 2,
+          "position": "DEF",
+          "number": 14,
+          "name": "Anderson Skarstad"
+        },
+        {
+          "number": 10,
+          "position": "FWD",
+          "name": "Rafael Washburn",
+          "id": "p-1779066160431",
+          "year": 4
+        },
+        {
+          "year": 2,
+          "id": "p-1779066194467",
+          "name": "Ambrose Cornelius",
+          "position": "FWD",
+          "number": 16
+        },
+        {
+          "position": "DEF",
+          "number": 28,
+          "name": "Edward Marotta",
+          "id": "p-1779066207542",
+          "year": 4
+        },
+        {
+          "id": "p-1779066229576",
+          "year": 4,
+          "position": "MID",
+          "number": 17,
+          "name": "Daniel Lumbu "
+        },
+        {
+          "year": 3,
+          "id": "p-1779066333000",
+          "name": "Patrick Moran",
+          "number": 18,
+          "position": "DEF"
+        },
+        {
+          "number": 19,
+          "position": "FWD",
+          "name": "Oscar Peche",
+          "id": "p-1779066364874",
+          "year": 2
+        },
+        {
+          "position": "MID",
+          "number": 20,
+          "name": "Sebastian Clemente",
+          "id": "p-1779066397293",
+          "year": 2
+        },
+        {
+          "number": 21,
+          "position": "FWD",
+          "name": "Roan Arendtsz",
+          "id": "p-1779066512121",
+          "year": 4
+        },
+        {
+          "position": "FWD",
+          "number": 22,
+          "name": "Jesse Blossom",
+          "id": "p-1779067308237",
+          "year": 2
+        }
+      ],
+      "season": "2026-2027"
+    }
+  ],
+  "leadership": [
+    {
+      "id": "lead-2425-1",
+      "name": "Marcos",
+      "bio": "Senior, Political Science",
+      "role": "Club President",
+      "season": "2024-2025"
+    },
+    {
+      "id": "lead-2425-2",
+      "role": "Club Vice President",
+      "season": "2024-2025",
+      "name": "Daniel Reyes",
+      "bio": "Junior, Economics"
+    },
+    {
+      "id": "lead-2425-3",
+      "season": "2024-2025",
+      "role": "Club Treasurer",
+      "name": "Felix Nguyen",
+      "bio": "Junior, Mathematics"
+    },
+    {
+      "id": "lead-2425-4",
+      "role": "Captain",
+      "season": "2024-2025",
+      "bio": "Senior, Computer Science",
+      "name": "Jordan Mills"
+    },
+    {
+      "id": "lead-2425-5",
+      "season": "2024-2025",
+      "role": "Social Captain",
+      "name": "Tyler Brooks",
+      "bio": "Junior, Psychology"
+    },
+    {
+      "id": "lead-2425-6",
+      "bio": "Freshman",
+      "name": "Alex Rivera",
+      "role": "Freshman Liaison",
+      "season": "2024-2025"
+    },
+    {
+      "id": "lead-2526-1",
+      "role": "Club President",
+      "season": "2025-2026",
+      "bio": "Junior, Classics",
+      "name": "Edward Marotta"
+    },
+    {
+      "id": "lead-2526-2",
+      "season": "2025-2026",
+      "role": "Club Vice President",
+      "name": "Owen Berg",
+      "bio": "Senior, History"
+    },
+    {
+      "id": "lead-2526-3",
+      "name": "Shiv Antar Khalsa",
+      "bio": "Sophomore, Biology",
+      "season": "2025-2026",
+      "role": "Club Treasurer"
+    },
+    {
+      "id": "lead-2526-5",
+      "role": "Captain",
+      "season": "2025-2026",
+      "name": "Nacho Obando",
+      "bio": "Sophomore, Physics"
+    },
+    {
+      "id": "lead-2526-8",
+      "name": "Saul Zis",
+      "bio": "Sophomore, Cognitive Science",
+      "role": "Campus OutReach Manager",
+      "season": "2025-2026"
+    }
+  ],
+  "_imageMap": {}
+}

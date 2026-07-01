@@ -32,6 +32,117 @@ export const storage = getStorage(app);
 
 // --- Types ---
 
+export interface AboutContent {
+  hero: { label: string; headline: string; description: string };
+  story: { label: string; heading: string; paragraph1: string; paragraph2: string };
+  values: {
+    sectionLabel: string;
+    sectionHeading: string;
+    items: { title: string; description: string }[];
+  };
+  faq: {
+    sectionLabel: string;
+    sectionHeading: string;
+    items: { q: string; a: string }[];
+  };
+  cta: { heading: string; description: string };
+}
+
+export const DEFAULT_ABOUT: AboutContent = {
+  hero: {
+    label: "Carleton Club Soccer",
+    headline: "Passion for the Beautiful Game",
+    description:
+      "We're a student-run soccer club at Carleton College — built on competition, community, and a shared love for the sport.",
+  },
+  story: {
+    label: "Our Story",
+    heading: "Built by students, for students",
+    paragraph1:
+      "Carleton Club Soccer was founded by students who wanted the structure and camaraderie of organized soccer without the pressure of varsity athletics. What started as a small group kicking a ball around campus has grown into a full-fledged club competing against colleges across Minnesota.",
+    paragraph2:
+      "We receive no varsity budget, which means everything — every practice, every away trip, every team kit — happens because our members show up and make it happen. That ownership is what makes this club special.",
+  },
+  values: {
+    sectionLabel: "What We Stand For",
+    sectionHeading: "More than just a club",
+    items: [
+      {
+        title: "Student-Run",
+        description:
+          "Every decision — from scheduling practice to planning tournaments — is made by students, for students. No athletic department oversight, just players who love the game running the show.",
+      },
+      {
+        title: "Competitive",
+        description:
+          "We play hard. Our teams face off against other Minnesota colleges in a full fall and spring schedule, competing for bragging rights and building real match experience.",
+      },
+      {
+        title: "Open to Everyone",
+        description:
+          "Whether you played varsity in high school or just enjoy a kickabout on the weekends, there's a place for you here. We welcome all skill levels and all years.",
+      },
+      {
+        title: "Community",
+        description:
+          "Beyond the 90 minutes, we're a community. Team dinners, social events, and years of friendships forged on Carleton's fields make this more than just a club.",
+      },
+    ],
+  },
+  faq: {
+    sectionLabel: "FAQ",
+    sectionHeading: "Common questions",
+    items: [
+      {
+        q: "Do I need prior experience to join?",
+        a: "Not at all. We welcome players of all ability levels, from first-timers to former high-school starters.",
+      },
+      {
+        q: "When do you practice and play?",
+        a: "We hold regular practices each week and play a full schedule of games against other Minnesota colleges in the fall and spring.",
+      },
+      {
+        q: "How much does it cost?",
+        a: "Members pay dues each season to help cover field reservations, equipment, and travel. The exact amount is set by the club treasurer at the start of each year.",
+      },
+      {
+        q: "How do I join?",
+        a: "Show up to a practice or reach out through our contact page. There's no tryout — just a love for the game.",
+      },
+    ],
+  },
+  cta: {
+    heading: "Ready to play?",
+    description:
+      "Come out to a practice, meet the team, and see what Carleton Club Soccer is all about.",
+  },
+};
+
+export async function getAboutContent(): Promise<AboutContent> {
+  const snap = await getDoc(doc(db, "content", "about"));
+  if (!snap.exists()) return DEFAULT_ABOUT;
+  const data = snap.data() as Partial<AboutContent>;
+  return {
+    hero: { ...DEFAULT_ABOUT.hero, ...data.hero },
+    story: { ...DEFAULT_ABOUT.story, ...data.story },
+    values: {
+      ...DEFAULT_ABOUT.values,
+      ...data.values,
+      items: data.values?.items ?? DEFAULT_ABOUT.values.items,
+    },
+    faq: {
+      ...DEFAULT_ABOUT.faq,
+      ...data.faq,
+      items: data.faq?.items ?? DEFAULT_ABOUT.faq.items,
+    },
+    cta: { ...DEFAULT_ABOUT.cta, ...data.cta },
+  };
+}
+
+export async function saveAboutContent(data: AboutContent): Promise<void> {
+  await setDoc(doc(db, "content", "about"), data);
+}
+
 export interface Coach {
   id: string;
   name: string;
