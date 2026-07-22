@@ -6,6 +6,7 @@ const sections = [
   { href: "/admin/roster",   label: "Roster",   description: "Manage players by season" },
   { href: "/admin/leaders",  label: "Leaders",  description: "Update scoring leaderboard" },
   { href: "/admin/about",    label: "About",    description: "Edit the About Us page content" },
+  { href: "/admin/donate",   label: "Donate",   description: "Edit the Donate page content" },
 ];
 
 export default function AdminPage() {

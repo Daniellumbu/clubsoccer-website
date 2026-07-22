@@ -143,6 +143,124 @@ export async function saveAboutContent(data: AboutContent): Promise<void> {
   await setDoc(doc(db, "content", "about"), data);
 }
 
+export interface DonateContent {
+  donateUrl: string;
+  hero: { label: string; headline: string; description: string; buttonText: string };
+  about: { heading: string; paragraph1: string; paragraph2: string };
+  uses: {
+    sectionHeading: string;
+    items: { icon: string; title: string; description: string }[];
+  };
+  impact: {
+    heading: string;
+    description: string;
+    tiers: { amount: string; impact: string }[];
+    buttonText: string;
+  };
+  questions: { heading: string; description: string };
+}
+
+export const DEFAULT_DONATE: DonateContent = {
+  donateUrl: "https://givebutter.com/your-campaign",
+  hero: {
+    label: "Carleton Club Soccer",
+    headline: "Support the Team You Love",
+    description:
+      "Every dollar you give goes directly toward giving our players the resources they need to compete, grow, and build lasting friendships.",
+    buttonText: "Donate Now →",
+  },
+  about: {
+    heading: "About the Endowment Fund",
+    paragraph1:
+      "Carleton Club Soccer is an entirely student-run organization. We receive no varsity budget — every piece of equipment, every away trip, and every team dinner is made possible through member dues and the generosity of alumni, parents, and friends like you.",
+    paragraph2:
+      "Contributions to our endowment fund are pooled and managed by the club treasurer under Carleton's student organization financial guidelines, ensuring your gift is used responsibly and transparently.",
+  },
+  uses: {
+    sectionHeading: "Where Your Money Goes",
+    items: [
+      {
+        icon: "⚽",
+        title: "Equipment & Gear",
+        description:
+          "Balls, cones, pinnies, goals, and training aids that keep every practice running at full speed.",
+      },
+      {
+        icon: "🚌",
+        title: "Travel & Tournament Fees",
+        description:
+          "Transportation, lodging, and entry fees for away games and regional club tournaments.",
+      },
+      {
+        icon: "👕",
+        title: "Uniforms & Kit",
+        description:
+          "Matching kits keep us looking sharp and help build the team identity on and off the field.",
+      },
+      {
+        icon: "🎉",
+        title: "Team Events & Culture",
+        description:
+          "End-of-season banquets, team-building outings, and social events that strengthen our community.",
+      },
+      {
+        icon: "📋",
+        title: "Field Reservations",
+        description:
+          "Securing dedicated practice time on quality fields so we can train consistently throughout the season.",
+      },
+      {
+        icon: "🏥",
+        title: "First Aid & Safety",
+        description:
+          "Medical supplies, ice, and safety equipment to keep every player healthy and protected.",
+      },
+    ],
+  },
+  impact: {
+    heading: "Every Contribution Counts",
+    description:
+      "No gift is too small. Whether you give $10 or $1,000, you are directly investing in the experience of Carleton students who share a passion for the beautiful game.",
+    tiers: [
+      { amount: "$25", impact: "covers a match ball for a full practice" },
+      { amount: "$100", impact: "helps fund travel to a regional tournament" },
+      { amount: "$250", impact: "sponsors a full kit for one player" },
+    ],
+    buttonText: "Make a Gift →",
+  },
+  questions: {
+    heading: "Questions?",
+    description:
+      "Reach out to our club treasurer or visit the contact page and we will get back to you as soon as possible.",
+  },
+};
+
+export async function getDonateContent(): Promise<DonateContent> {
+  const snap = await getDoc(doc(db, "content", "donate"));
+  if (!snap.exists()) return DEFAULT_DONATE;
+  const data = snap.data() as Partial<DonateContent>;
+  return {
+    donateUrl: data.donateUrl ?? DEFAULT_DONATE.donateUrl,
+    hero: { ...DEFAULT_DONATE.hero, ...data.hero },
+    about: { ...DEFAULT_DONATE.about, ...data.about },
+    uses: {
+      ...DEFAULT_DONATE.uses,
+      ...data.uses,
+      items: data.uses?.items ?? DEFAULT_DONATE.uses.items,
+    },
+    impact: {
+      ...DEFAULT_DONATE.impact,
+      ...data.impact,
+      tiers: data.impact?.tiers ?? DEFAULT_DONATE.impact.tiers,
+    },
+    questions: { ...DEFAULT_DONATE.questions, ...data.questions },
+  };
+}
+
+export async function saveDonateContent(data: DonateContent): Promise<void> {
+  await setDoc(doc(db, "content", "donate"), data);
+}
+
 export interface Coach {
   id: string;
   name: string;

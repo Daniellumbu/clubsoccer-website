@@ -1,6 +1,9 @@
-// Replace INSTAGRAM_URL and EMAIL with real values when ready
+"use client";
+
+import { useState } from "react";
+
+// Replace INSTAGRAM_URL when ready
 const INSTAGRAM_URL = "https://instagram.com/carletonclubsoccer";
-const EMAIL = "clubsoccer@carleton.edu";
 
 function InstagramIcon() {
   return (
@@ -10,25 +13,114 @@ function InstagramIcon() {
   );
 }
 
-function EmailIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-10 h-10">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-    </svg>
-  );
-}
+type Status = "idle" | "sending" | "sent" | "error";
 
 export default function ContactPage() {
+  const [form, setForm] = useState({ name: "", phone: "", email: "", message: "" });
+  const [status, setStatus] = useState<Status>("idle");
+  const [error, setError] = useState<string | null>(null);
+
+  function setField(field: keyof typeof form, value: string) {
+    setForm((f) => ({ ...f, [field]: value }));
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
+      setStatus("error");
+      setError("Name, email, and message are required.");
+      return;
+    }
+    setStatus("sending");
+    setError(null);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Something went wrong.");
+      setStatus("sent");
+      setForm({ name: "", phone: "", email: "", message: "" });
+    } catch (err) {
+      setStatus("error");
+      setError((err as Error).message);
+    }
+  }
+
+  const inputCls =
+    "border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-carleton-blue w-full";
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       <h1 className="text-4xl font-bold text-gray-900 mb-2">Contact</h1>
       <p className="text-gray-500 mb-12">Get in touch with Carleton Club Soccer.</p>
 
-      <div className="grid sm:grid-cols-2 gap-8">
+      <div className="grid sm:grid-cols-5 gap-8">
+        {/* Contact form */}
+        <form
+          onSubmit={handleSubmit}
+          className="sm:col-span-3 flex flex-col gap-4 bg-white border border-gray-100 rounded-2xl shadow-sm p-6"
+        >
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">Name <span className="text-red-500">*</span></label>
+            <input
+              required
+              value={form.name}
+              onChange={(e) => setField("name", e.target.value)}
+              className={inputCls}
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">Phone Number</label>
+            <input
+              type="tel"
+              value={form.phone}
+              onChange={(e) => setField("phone", e.target.value)}
+              className={inputCls}
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">Email <span className="text-red-500">*</span></label>
+            <input
+              type="email"
+              required
+              value={form.email}
+              onChange={(e) => setField("email", e.target.value)}
+              className={inputCls}
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">Message <span className="text-red-500">*</span></label>
+            <textarea
+              required
+              rows={5}
+              value={form.message}
+              onChange={(e) => setField("message", e.target.value)}
+              className={inputCls + " resize-none"}
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={status === "sending"}
+            className="mt-2 bg-carleton-blue text-white font-semibold px-6 py-3 rounded-full text-sm hover:opacity-90 disabled:opacity-50 transition-opacity"
+          >
+            {status === "sending" ? "Sending…" : "Send Message"}
+          </button>
+          {status === "sent" && (
+            <p className="text-sm text-green-600 font-medium">
+              Thanks! We&apos;ll get back to you soon.
+            </p>
+          )}
+          {status === "error" && (
+            <p className="text-sm text-red-600 font-medium">{error}</p>
+          )}
+        </form>
 
         {/* Instagram card */}
-        <div className="flex flex-col rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
-          {/* Placeholder image — swap with <Image> when you have a real photo */}
+        <div className="sm:col-span-2 flex flex-col rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
           <div className="aspect-[4/3] bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 flex flex-col items-center justify-center text-white gap-3">
             <InstagramIcon />
             <p className="text-sm font-medium opacity-80 tracking-wide">Photo coming soon</p>
@@ -47,27 +139,6 @@ export default function ContactPage() {
             </a>
           </div>
         </div>
-
-        {/* Email card */}
-        <div className="flex flex-col rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
-          {/* Placeholder image — swap with <Image> when you have a real photo */}
-          <div className="aspect-[4/3] bg-gradient-to-br from-carleton-blue to-blue-900 flex flex-col items-center justify-center text-white gap-3">
-            <EmailIcon />
-            <p className="text-sm font-medium opacity-80 tracking-wide">Photo coming soon</p>
-          </div>
-          <div className="p-6 bg-white flex flex-col items-center text-center gap-2">
-            <p className="font-semibold text-gray-900">Email Us</p>
-            <p className="text-sm text-gray-500">Questions about joining, scheduling, or sponsorship? Reach out directly.</p>
-            <a
-              href={`mailto:${EMAIL}`}
-              className="mt-3 inline-flex items-center gap-2 bg-carleton-blue text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:opacity-90 transition-opacity"
-            >
-              <EmailIcon />
-              {EMAIL}
-            </a>
-          </div>
-        </div>
-
       </div>
     </div>
   );
