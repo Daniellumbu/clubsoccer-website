@@ -3,7 +3,12 @@
     "allow": [
       "Bash(npm run *)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3001)",
-      "Bash(kill %1)"
+      "Bash(kill %1)",
+      "Bash(curl -s http://localhost:3000 -o /dev/null -w \"%{http_code}\\\\n\")",
+      "Bash(chromium-cli --help)",
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(lsof -ti:3000 -sTCP:LISTEN)",
+      "Bash(xargs -r kill)"
     ]
   }
 }
