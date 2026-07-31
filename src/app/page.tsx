@@ -33,11 +33,11 @@ export default function HomePage() {
         />
         <div className="absolute inset-0 bg-carleton-blue/70" />
         <div className="relative z-10 px-4">
-          <p className="text-2xl sm:text-4xl font-bold uppercase tracking-widest text-carleton-maize mb-3">
-            Carleton College
-          </p>
-          <h1 className="text-5xl sm:text-7xl font-bold tracking-tight text-white mb-5">
-            Club Soccer
+          <h1 className="font-bold tracking-tight text-white mb-5">
+            <span className="block text-2xl sm:text-4xl uppercase tracking-widest text-carleton-maize mb-3">
+              Carleton College
+            </span>
+            <span className="block text-5xl sm:text-7xl">Club Soccer</span>
           </h1>
           <p className="text-lg text-white/80 max-w-xl mx-auto">
             Schedules, roster, and season stats for Carleton&apos;s club soccer team.
