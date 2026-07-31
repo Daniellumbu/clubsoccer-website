@@ -10,8 +10,8 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "Club Soccer",
-  description: "Official club soccer team website",
+  title: "Carleton College Club Soccer",
+  description: "Official Carleton College club soccer team website",
 };
 
 export default function RootLayout({
