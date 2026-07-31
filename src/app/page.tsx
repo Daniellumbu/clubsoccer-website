@@ -37,7 +37,7 @@ export default function HomePage() {
             <span className="block text-2xl sm:text-4xl uppercase tracking-widest text-carleton-maize mb-3">
               Carleton College
             </span>
-            <span className="block text-5xl sm:text-7xl">Club Soccer</span>
+            <span className="block text-5xl sm:text-7xl"> Carleton College Club Soccer</span>
           </h1>
           <p className="text-lg text-white/80 max-w-xl mx-auto">
             Schedules, roster, and season stats for Carleton&apos;s club soccer team.
