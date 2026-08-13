@@ -29,7 +29,7 @@ export default function HomePage() {
           alt="Carleton Club Soccer team"
           fill
           priority
-          className="object-cover object-center"
+          className="object-contain object-center"
         />
         <div className="absolute inset-0 bg-carleton-blue/70" />
         <div className="relative z-10 px-4">
@@ -73,7 +73,7 @@ export default function HomePage() {
           src="/backgroundimage2.png"
           alt="Carleton Club Soccer fall season"
           fill
-          className="object-cover object-center"
+          className="object-contain object-center"
         />
         <div className="absolute inset-0 bg-gray-900/65" />
         <div className="relative z-10 text-center px-4">
