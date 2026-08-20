@@ -23,13 +23,13 @@ export default function HomePage() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative min-h-[75vh] flex items-center justify-center text-center overflow-hidden">
+      <section className="relative min-h-[50vh] sm:min-h-[65vh] flex items-center justify-center text-center overflow-hidden">
         <Image
           src="/backgroungImage1.JPG"
           alt="Carleton Club Soccer team"
           fill
           priority
-          className="object-contain object-center"
+          className="object-cover object-center"
         />
         <div className="absolute inset-0 bg-carleton-blue/70" />
         <div className="relative z-10 px-4">
@@ -73,7 +73,7 @@ export default function HomePage() {
           src="/backgroundimage2.png"
           alt="Carleton Club Soccer fall season"
           fill
-          className="object-contain object-center"
+          className="object-cover object-center"
         />
         <div className="absolute inset-0 bg-gray-900/65" />
         <div className="relative z-10 text-center px-4">
