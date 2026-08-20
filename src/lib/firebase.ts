@@ -288,6 +288,14 @@ export interface ScheduleGame {
   location: string;
   isHome: boolean;
   result?: string;
+  /** Drives result coloring (win = green, loss = red, tie = neutral). */
+  outcome?: "win" | "loss" | "tie";
+  /** Recap blurb, shown only if present. */
+  summary?: string;
+  /** Free-text box score / top performers, shown only if present. */
+  boxScore?: string;
+  /** Livestream link, shown only if present. */
+  livestreamUrl?: string;
 }
 
 export interface Schedule {

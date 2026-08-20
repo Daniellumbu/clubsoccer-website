@@ -14,9 +14,9 @@ import {
 } from "@/lib/firebase";
 import { SCHOOLS, findSchool, HOME_LOCATION, type School } from "@/lib/schools";
 
-type GameFormData = Omit<ScheduleGame, "id">;
+type GameFormData = Pick<ScheduleGame, "date" | "opponent" | "location" | "isHome">;
 
-const emptyGame: GameFormData = { date: "", opponent: "", location: HOME_LOCATION, isHome: true, result: "" };
+const emptyGame: GameFormData = { date: "", opponent: "", location: HOME_LOCATION, isHome: true };
 
 const inputCls = "border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-carleton-blue w-full";
 
@@ -142,11 +142,6 @@ function GameForm({ form, setForm, onSubmit, onCancel, label, saving, error }: {
         )}
       </div>
 
-      <div>
-        <label className="block text-xs font-medium text-gray-600 mb-1">Result (optional)</label>
-        <input value={form.result ?? ""} onChange={(e) => setForm({ ...form, result: e.target.value })} className={inputCls} placeholder="W 2-1" />
-      </div>
-
       {error && <p className="text-sm text-red-600">{error}</p>}
       <div className="flex gap-3">
         <button type="submit" disabled={saving} className="bg-carleton-blue text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity">
@@ -194,19 +189,20 @@ export default function AdminSchedulePage() {
 
   function startEdit(game: ScheduleGame) {
     setEditingId(game.id);
-    setEditForm({ date: game.date, opponent: game.opponent, location: game.location, isHome: game.isHome, result: game.result ?? "" });
+    setEditForm({ date: game.date, opponent: game.opponent, location: game.location, isHome: game.isHome });
     setShowAdd(false);
   }
 
   async function handleUpdate(e: React.FormEvent) {
     e.preventDefault();
     if (!editingId || !selectedId) return;
+    const original = games.find((g) => g.id === editingId);
+    if (!original) return;
     setSaving(true);
     setError(null);
     try {
-      const data = { ...editForm };
-      if (!data.result) delete data.result;
-      await updateGameInSchedule(selectedId, editingId, data);
+      // Preserve result/outcome/recap fields managed in the Results tab — this form only edits basic info.
+      await updateGameInSchedule(selectedId, editingId, { ...original, ...editForm });
       setEditingId(null);
       await load();
     } catch (err: unknown) {
@@ -222,9 +218,7 @@ export default function AdminSchedulePage() {
     setSaving(true);
     setError(null);
     try {
-      const data = { ...addForm };
-      if (!data.result) delete data.result;
-      await addGameToSchedule(selectedId, data);
+      await addGameToSchedule(selectedId, addForm);
       setShowAdd(false);
       setAddForm(emptyGame);
       await load();
