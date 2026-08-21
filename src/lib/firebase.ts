@@ -14,6 +14,7 @@ import {
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import type { School } from "./schools";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -328,6 +329,11 @@ export async function getCoaches(): Promise<Coach[]> {
   return snap.docs.map((d) => ({ id: d.id, ...d.data() } as Coach));
 }
 
+export async function getSchools(): Promise<School[]> {
+  const snap = await getDocs(query(collection(db, "schools"), orderBy("name")));
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() } as School));
+}
+
 export async function getSchedules(): Promise<Schedule[]> {
   const snap = await getDocs(query(collection(db, "schedules"), orderBy("season", "desc")));
   return snap.docs.map((d) => ({ id: d.id, ...d.data() } as Schedule));
@@ -371,6 +377,21 @@ export async function saveCoach(id: string | null, data: Omit<Coach, "id">): Pro
 
 export async function deleteCoach(id: string): Promise<void> {
   await deleteDoc(doc(db, "coaches", id));
+}
+
+// --- Write helpers: Schools (opponent directory) ---
+
+export async function saveSchool(id: string | null, data: Omit<School, "id">): Promise<string> {
+  if (id) {
+    await setDoc(doc(db, "schools", id), data);
+    return id;
+  }
+  const docRef = await addDoc(collection(db, "schools"), data);
+  return docRef.id;
+}
+
+export async function deleteSchool(id: string): Promise<void> {
+  await deleteDoc(doc(db, "schools", id));
 }
 
 // --- Write helpers: Schedule (season-based) ---
@@ -504,6 +525,10 @@ export function uploadLeaderPhoto(file: File | Blob, fileName = "photo.jpg"): Pr
 
 export function uploadPlayerImage(file: File | Blob, rosterId: string, fileName = "photo.jpg"): Promise<string> {
   return uploadPhoto(file, `players/${rosterId}`, fileName);
+}
+
+export function uploadSchoolLogo(file: File | Blob, fileName = "logo.png"): Promise<string> {
+  return uploadPhoto(file, "schools", fileName);
 }
 
 // --- Write helpers: Leadership ---

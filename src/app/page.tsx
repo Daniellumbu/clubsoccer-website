@@ -3,11 +3,13 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { getNextMatch, type ScheduleGame } from "@/lib/firebase";
+import { getNextMatch, getSchools, type ScheduleGame } from "@/lib/firebase";
 import { MatchRow } from "@/components/ui/MatchRow";
+import type { School } from "@/lib/schools";
 
 export default function HomePage() {
   const [nextMatch, setNextMatch] = useState<ScheduleGame | null | undefined>(undefined);
+  const [schools, setSchools] = useState<School[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -18,6 +20,9 @@ export default function HomePage() {
         setError(err?.message ?? "Failed to load next match.");
         setNextMatch(null);
       });
+    getSchools()
+      .then(setSchools)
+      .catch((err) => console.error("[home/schools]", err));
   }, []);
 
   return (
@@ -63,7 +68,7 @@ export default function HomePage() {
           {nextMatch === null && !error && (
             <p className="text-gray-400 text-sm">No upcoming matches scheduled.</p>
           )}
-          {nextMatch && <MatchRow game={nextMatch} />}
+          {nextMatch && <MatchRow game={nextMatch} schools={schools} />}
         </section>
       </div>
 

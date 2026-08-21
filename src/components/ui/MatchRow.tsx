@@ -3,10 +3,11 @@
 import { useState } from "react";
 import Image from "next/image";
 import type { ScheduleGame } from "@/lib/firebase";
-import { findSchool } from "@/lib/schools";
+import { findSchool, type School } from "@/lib/schools";
 
 interface MatchRowProps {
   game: ScheduleGame;
+  schools: School[];
 }
 
 const OUTCOME_COLORS = {
@@ -24,9 +25,9 @@ function formatDate(iso: string): string {
   });
 }
 
-export function MatchRow({ game }: MatchRowProps) {
+export function MatchRow({ game, schools }: MatchRowProps) {
   const [expanded, setExpanded] = useState(false);
-  const school = findSchool(game.opponent);
+  const school = findSchool(schools, game.opponent);
   const hasDetails = Boolean(game.summary || game.boxScore || game.livestreamUrl);
   const outcomeColor = game.outcome ? OUTCOME_COLORS[game.outcome] : null;
 

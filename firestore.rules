@@ -22,6 +22,12 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Schools (opponent directory: names, logos, locations)
+    match /schools/{schoolId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Schedules (one doc per season, contains a `games` array)
     match /schedules/{scheduleId} {
       allow read: if true;

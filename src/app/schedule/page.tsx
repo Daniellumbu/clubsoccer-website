@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSchedules, type Schedule } from "@/lib/firebase";
+import { getSchedules, getSchools, type Schedule } from "@/lib/firebase";
 import { MatchRow } from "@/components/ui/MatchRow";
+import type { School } from "@/lib/schools";
 
 const today = new Date().toISOString().split("T")[0];
 
 export default function SchedulePage() {
   const [schedules, setSchedules] = useState<Schedule[] | undefined>(undefined);
+  const [schools, setSchools] = useState<School[]>([]);
   const [selectedId, setSelectedId] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
 
@@ -22,6 +24,9 @@ export default function SchedulePage() {
         setError(err?.message ?? "Failed to load schedule.");
         setSchedules([]);
       });
+    getSchools()
+      .then(setSchools)
+      .catch((err) => console.error("[schedule/schools]", err));
   }, []);
 
   const schedule = schedules?.find((s) => s.id === selectedId) ?? null;
@@ -72,7 +77,7 @@ export default function SchedulePage() {
             <section>
               <h2 className="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-4">Upcoming</h2>
               <div className="space-y-3">
-                {upcoming.map((game) => <MatchRow key={game.id} game={game} />)}
+                {upcoming.map((game) => <MatchRow key={game.id} game={game} schools={schools} />)}
               </div>
             </section>
           )}
@@ -80,7 +85,7 @@ export default function SchedulePage() {
             <section>
               <h2 className="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-4">Results</h2>
               <div className="space-y-3">
-                {past.map((game) => <MatchRow key={game.id} game={game} />)}
+                {past.map((game) => <MatchRow key={game.id} game={game} schools={schools} />)}
               </div>
             </section>
           )}

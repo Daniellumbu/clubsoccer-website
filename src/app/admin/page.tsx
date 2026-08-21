@@ -4,6 +4,7 @@ const sections = [
   { href: "/admin/coach",    label: "Coach",    description: "Edit coach profile and bio" },
   { href: "/admin/schedule", label: "Schedule", description: "Add, edit, and remove games" },
   { href: "/admin/results",  label: "Results",  description: "Add recaps, box scores, and livestream links for past games" },
+  { href: "/admin/schools",  label: "Schools",  description: "Manage opponent names and logos" },
   { href: "/admin/roster",   label: "Roster",   description: "Manage players by season" },
   { href: "/admin/leaders",  label: "Leaders",  description: "Update scoring leaderboard" },
   { href: "/admin/about",    label: "About",    description: "Edit the About Us page content" },

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   getSchedules,
+  getSchools,
   createScheduleSeason,
   deleteScheduleSeason,
   addGameToSchedule,
@@ -12,7 +13,7 @@ import {
   type Schedule,
   type ScheduleGame,
 } from "@/lib/firebase";
-import { SCHOOLS, findSchool, HOME_LOCATION, type School } from "@/lib/schools";
+import { findSchool, HOME_LOCATION, type School } from "@/lib/schools";
 
 type GameFormData = Pick<ScheduleGame, "date" | "opponent" | "location" | "isHome">;
 
@@ -25,7 +26,7 @@ function formatDate(iso: string) {
   return new Date(y, m - 1, d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
-function GameForm({ form, setForm, onSubmit, onCancel, label, saving, error }: {
+function GameForm({ form, setForm, onSubmit, onCancel, label, saving, error, schools }: {
   form: GameFormData;
   setForm: (f: GameFormData) => void;
   onSubmit: (e: React.FormEvent) => void;
@@ -33,12 +34,13 @@ function GameForm({ form, setForm, onSubmit, onCancel, label, saving, error }: {
   label: string;
   saving: boolean;
   error: string | null;
+  schools: School[];
 }) {
   const [query, setQuery] = useState(form.opponent);
   const [open, setOpen] = useState(false);
 
   const suggestions: School[] = query.length > 0
-    ? SCHOOLS.filter((s) => s.name.toLowerCase().includes(query.toLowerCase())).slice(0, 7)
+    ? schools.filter((s) => s.name.toLowerCase().includes(query.toLowerCase())).slice(0, 7)
     : [];
 
   function selectSchool(school: School) {
@@ -54,7 +56,7 @@ function GameForm({ form, setForm, onSubmit, onCancel, label, saving, error }: {
   }
 
   function setHomeAway(isHome: boolean) {
-    const school = findSchool(form.opponent);
+    const school = findSchool(schools, form.opponent);
     if (isHome) {
       setForm({ ...form, isHome: true, location: HOME_LOCATION });
     } else {
@@ -62,7 +64,7 @@ function GameForm({ form, setForm, onSubmit, onCancel, label, saving, error }: {
     }
   }
 
-  const school = findSchool(form.opponent);
+  const school = findSchool(schools, form.opponent);
   const needsCustomLocation = !form.isHome && !school;
 
   return (
@@ -157,6 +159,7 @@ function GameForm({ form, setForm, onSubmit, onCancel, label, saving, error }: {
 
 export default function AdminSchedulePage() {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [schools, setSchools] = useState<School[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string>("");
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -172,8 +175,9 @@ export default function AdminSchedulePage() {
     setLoading(true);
     setError(null);
     try {
-      const data = await getSchedules();
+      const [data, schoolData] = await Promise.all([getSchedules(), getSchools()]);
       setSchedules(data);
+      setSchools(schoolData);
       if (data.length > 0 && !selectedId) setSelectedId(data[0].id);
     } catch (err: unknown) {
       setError((err as Error).message);
@@ -270,9 +274,14 @@ export default function AdminSchedulePage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <Link href="/admin" className="text-sm text-gray-400 hover:text-carleton-blue transition-colors mb-6 inline-block">
-        ← Admin
-      </Link>
+      <div className="flex items-center justify-between mb-6">
+        <Link href="/admin" className="text-sm text-gray-400 hover:text-carleton-blue transition-colors inline-block">
+          ← Admin
+        </Link>
+        <Link href="/admin/schools" className="text-sm text-carleton-blue hover:opacity-70 transition-opacity">
+          Manage schools →
+        </Link>
+      </div>
 
       <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
         <h1 className="text-4xl font-bold text-gray-900">Schedule</h1>
@@ -348,9 +357,10 @@ export default function AdminSchedulePage() {
                   label="Save Changes"
                   saving={saving}
                   error={error}
+                  schools={schools}
                 />
               );
-              const school = findSchool(game.opponent);
+              const school = findSchool(schools, game.opponent);
               return (
                 <div key={game.id} className="flex items-center justify-between bg-white border border-gray-100 rounded-xl px-5 py-3 shadow-sm gap-4">
                   <div className="flex items-center gap-4 min-w-0">
@@ -389,6 +399,7 @@ export default function AdminSchedulePage() {
               label="Add Game"
               saving={saving}
               error={error}
+              schools={schools}
             />
           ) : (
             <button

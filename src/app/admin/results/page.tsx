@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getSchedules, updateGameInSchedule, type Schedule, type ScheduleGame } from "@/lib/firebase";
-import { findSchool } from "@/lib/schools";
+import { getSchedules, getSchools, updateGameInSchedule, type Schedule, type ScheduleGame } from "@/lib/firebase";
+import { findSchool, type School } from "@/lib/schools";
 
 const today = new Date().toISOString().split("T")[0];
 
@@ -48,6 +48,7 @@ function toFormData(game: ScheduleGame): ResultFormData {
 
 export default function AdminResultsPage() {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [schools, setSchools] = useState<School[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string>("");
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -59,8 +60,9 @@ export default function AdminResultsPage() {
     setLoading(true);
     setError(null);
     try {
-      const data = await getSchedules();
+      const [data, schoolData] = await Promise.all([getSchedules(), getSchools()]);
       setSchedules(data);
+      setSchools(schoolData);
       if (data.length > 0 && !selectedId) setSelectedId(data[0].id);
     } catch (err: unknown) {
       setError((err as Error).message);
@@ -153,7 +155,7 @@ export default function AdminResultsPage() {
       {!loading && schedule && pastGames.length > 0 && (
         <div className="space-y-3">
           {pastGames.map((game) => {
-            const school = findSchool(game.opponent);
+            const school = findSchool(schools, game.opponent);
             const hasDetails = Boolean(game.result || game.summary || game.boxScore || game.livestreamUrl);
 
             if (editingId === game.id) {
