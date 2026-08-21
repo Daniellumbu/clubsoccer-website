@@ -285,6 +285,8 @@ export interface ScheduleGame {
   id: string;
   /** ISO date string: YYYY-MM-DD */
   date: string;
+  /** 24-hour "HH:MM", shown only if present. */
+  time?: string;
   opponent: string;
   location: string;
   isHome: boolean;

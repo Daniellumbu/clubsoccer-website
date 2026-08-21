@@ -25,6 +25,13 @@ function formatDate(iso: string): string {
   });
 }
 
+function formatTime(time: string): string {
+  const [h, m] = time.split(":").map(Number);
+  const period = h >= 12 ? "PM" : "AM";
+  const hour12 = h % 12 || 12;
+  return `${hour12}:${String(m).padStart(2, "0")} ${period}`;
+}
+
 export function MatchRow({ game, schools }: MatchRowProps) {
   const [expanded, setExpanded] = useState(false);
   const school = findSchool(schools, game.opponent);
@@ -42,7 +49,8 @@ export function MatchRow({ game, schools }: MatchRowProps) {
       >
         <div className="flex items-center gap-4">
           <span className="text-sm font-medium text-gray-400 w-24 flex-shrink-0">
-            {formatDate(game.date)}
+            <span className="block">{formatDate(game.date)}</span>
+            {game.time && <span className="block text-xs text-gray-400/80">{formatTime(game.time)}</span>}
           </span>
           <div className="flex items-center gap-3">
             {school ? (

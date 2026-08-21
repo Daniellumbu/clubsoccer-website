@@ -15,15 +15,25 @@ import {
 } from "@/lib/firebase";
 import { findSchool, HOME_LOCATION, type School } from "@/lib/schools";
 
-type GameFormData = Pick<ScheduleGame, "date" | "opponent" | "location" | "isHome">;
+type GameFormData = Pick<ScheduleGame, "date" | "opponent" | "location" | "isHome"> & {
+  time: string;
+  livestreamUrl: string;
+};
 
-const emptyGame: GameFormData = { date: "", opponent: "", location: HOME_LOCATION, isHome: true };
+const emptyGame: GameFormData = { date: "", time: "", opponent: "", location: HOME_LOCATION, isHome: true, livestreamUrl: "" };
 
 const inputCls = "border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-carleton-blue w-full";
 
 function formatDate(iso: string) {
   const [y, m, d] = iso.split("-").map(Number);
   return new Date(y, m - 1, d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
+function formatTime(time: string): string {
+  const [h, m] = time.split(":").map(Number);
+  const period = h >= 12 ? "PM" : "AM";
+  const hour12 = h % 12 || 12;
+  return `${hour12}:${String(m).padStart(2, "0")} ${period}`;
 }
 
 function GameForm({ form, setForm, onSubmit, onCancel, label, saving, error, schools }: {
@@ -74,35 +84,40 @@ function GameForm({ form, setForm, onSubmit, onCancel, label, saving, error, sch
           <label className="block text-xs font-medium text-gray-600 mb-1">Date</label>
           <input type="date" required value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className={inputCls} />
         </div>
-        <div className="relative">
-          <label className="block text-xs font-medium text-gray-600 mb-1">Opponent</label>
-          <input
-            required
-            value={query}
-            onChange={handleOpponentChange}
-            onFocus={() => setOpen(true)}
-            onBlur={() => setTimeout(() => setOpen(false), 150)}
-            className={inputCls}
-            placeholder="Search for a school…"
-            autoComplete="off"
-          />
-          {open && suggestions.length > 0 && (
-            <div className="absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-56 overflow-y-auto">
-              {suggestions.map((s) => (
-                <button
-                  key={s.name}
-                  type="button"
-                  onMouseDown={(e) => { e.preventDefault(); selectSchool(s); }}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 text-left transition-colors"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={s.logo} alt={s.name} className="w-7 h-7 object-contain flex-shrink-0" />
-                  <span className="text-sm text-gray-800">{s.name}</span>
-                </button>
-              ))}
-            </div>
-          )}
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1">Time (optional)</label>
+          <input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} className={inputCls} />
         </div>
+      </div>
+
+      <div className="relative">
+        <label className="block text-xs font-medium text-gray-600 mb-1">Opponent</label>
+        <input
+          required
+          value={query}
+          onChange={handleOpponentChange}
+          onFocus={() => setOpen(true)}
+          onBlur={() => setTimeout(() => setOpen(false), 150)}
+          className={inputCls}
+          placeholder="Search for a school…"
+          autoComplete="off"
+        />
+        {open && suggestions.length > 0 && (
+          <div className="absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-56 overflow-y-auto">
+            {suggestions.map((s) => (
+              <button
+                key={s.name}
+                type="button"
+                onMouseDown={(e) => { e.preventDefault(); selectSchool(s); }}
+                className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 text-left transition-colors"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={s.logo} alt={s.name} className="w-7 h-7 object-contain flex-shrink-0" />
+                <span className="text-sm text-gray-800">{s.name}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <div>
@@ -142,6 +157,17 @@ function GameForm({ form, setForm, onSubmit, onCancel, label, saving, error, sch
         ) : (
           <p className="text-xs text-gray-400 mt-1">{form.location}</p>
         )}
+      </div>
+
+      <div>
+        <label className="block text-xs font-medium text-gray-600 mb-1">Livestream Link (optional)</label>
+        <input
+          type="url"
+          value={form.livestreamUrl}
+          onChange={(e) => setForm({ ...form, livestreamUrl: e.target.value })}
+          className={inputCls}
+          placeholder="https://…"
+        />
       </div>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
@@ -193,7 +219,14 @@ export default function AdminSchedulePage() {
 
   function startEdit(game: ScheduleGame) {
     setEditingId(game.id);
-    setEditForm({ date: game.date, opponent: game.opponent, location: game.location, isHome: game.isHome });
+    setEditForm({
+      date: game.date,
+      time: game.time ?? "",
+      opponent: game.opponent,
+      location: game.location,
+      isHome: game.isHome,
+      livestreamUrl: game.livestreamUrl ?? "",
+    });
     setShowAdd(false);
   }
 
@@ -206,7 +239,12 @@ export default function AdminSchedulePage() {
     setError(null);
     try {
       // Preserve result/outcome/recap fields managed in the Results tab — this form only edits basic info.
-      await updateGameInSchedule(selectedId, editingId, { ...original, ...editForm });
+      await updateGameInSchedule(selectedId, editingId, {
+        ...original,
+        ...editForm,
+        time: editForm.time || undefined,
+        livestreamUrl: editForm.livestreamUrl.trim() || undefined,
+      });
       setEditingId(null);
       await load();
     } catch (err: unknown) {
@@ -222,7 +260,11 @@ export default function AdminSchedulePage() {
     setSaving(true);
     setError(null);
     try {
-      await addGameToSchedule(selectedId, addForm);
+      await addGameToSchedule(selectedId, {
+        ...addForm,
+        time: addForm.time || undefined,
+        livestreamUrl: addForm.livestreamUrl.trim() || undefined,
+      });
       setShowAdd(false);
       setAddForm(emptyGame);
       await load();
@@ -364,7 +406,9 @@ export default function AdminSchedulePage() {
               return (
                 <div key={game.id} className="flex items-center justify-between bg-white border border-gray-100 rounded-xl px-5 py-3 shadow-sm gap-4">
                   <div className="flex items-center gap-4 min-w-0">
-                    <span className="text-sm text-gray-400 flex-shrink-0">{formatDate(game.date)}</span>
+                    <span className="text-sm text-gray-400 flex-shrink-0">
+                      {formatDate(game.date)}{game.time && ` · ${formatTime(game.time)}`}
+                    </span>
                     <div className="flex items-center gap-2 min-w-0">
                       {school && (
                         // eslint-disable-next-line @next/next/no-img-element
