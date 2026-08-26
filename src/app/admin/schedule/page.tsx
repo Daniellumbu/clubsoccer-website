@@ -74,9 +74,6 @@ function GameForm({ form, setForm, onSubmit, onCancel, label, saving, error, sch
     }
   }
 
-  const school = findSchool(schools, form.opponent);
-  const needsCustomLocation = !form.isHome && !school;
-
   return (
     <form onSubmit={onSubmit} className="bg-gray-50 border border-gray-200 rounded-xl p-5 space-y-4">
       <div className="grid sm:grid-cols-2 gap-4">
@@ -146,17 +143,13 @@ function GameForm({ form, setForm, onSubmit, onCancel, label, saving, error, sch
             Away
           </button>
         </div>
-        {needsCustomLocation ? (
-          <input
-            required
-            value={form.location}
-            onChange={(e) => setForm({ ...form, location: e.target.value })}
-            className={inputCls}
-            placeholder="Away field address"
-          />
-        ) : (
-          <p className="text-xs text-gray-400 mt-1">{form.location}</p>
-        )}
+        <input
+          required
+          value={form.location}
+          onChange={(e) => setForm({ ...form, location: e.target.value })}
+          className={inputCls}
+          placeholder={form.isHome ? "Home field address" : "Away field address"}
+        />
       </div>
 
       <div>

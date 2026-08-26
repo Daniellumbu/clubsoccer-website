@@ -21,6 +21,12 @@ service firebase.storage {
       allow write: if isAdmin() && isValidImage();
     }
 
+    // School (opponent) logos
+    match /schools/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidImage();
+    }
+
     // Leadership / scoring leader photos
     match /leaders/{fileName} {
       allow read: if true;
