@@ -168,7 +168,7 @@ export default function AdminResultsPage() {
                   <div className="flex items-center gap-3">
                     {school && (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={school.logo} alt={school.name} className="w-7 h-7 object-contain flex-shrink-0" />
+                      <img src={school.logo} alt={school.name} className="w-10 h-10 object-contain flex-shrink-0" />
                     )}
                     <div>
                       <p className="font-medium text-gray-900">vs. {game.opponent}</p>
@@ -260,7 +260,7 @@ export default function AdminResultsPage() {
                   <div className="flex items-center gap-2 min-w-0">
                     {school && (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={school.logo} alt={school.name} className="w-7 h-7 object-contain flex-shrink-0" />
+                      <img src={school.logo} alt={school.name} className="w-10 h-10 object-contain flex-shrink-0" />
                     )}
                     <div className="min-w-0">
                       <p className="font-medium text-gray-900 truncate">vs. {game.opponent}</p>

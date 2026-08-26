@@ -123,7 +123,7 @@ export default function AdminLeadersPage() {
     setError(null);
     try {
       let photoUrl = editForm.photoUrl || undefined;
-      if (editImageBlob) photoUrl = await uploadLeaderPhoto(editImageBlob, "leader-photo.jpg");
+      if (editImageBlob) photoUrl = await uploadLeaderPhoto(editImageBlob, "leader-photo.png");
       const data: Omit<LeadershipEntry, "id"> = {
         name: editForm.name,
         role: editForm.role,
@@ -150,7 +150,7 @@ export default function AdminLeadersPage() {
     setError(null);
     try {
       let photoUrl: string | undefined;
-      if (addImageBlob) photoUrl = await uploadLeaderPhoto(addImageBlob, "leader-photo.jpg");
+      if (addImageBlob) photoUrl = await uploadLeaderPhoto(addImageBlob, "leader-photo.png");
       const data: Omit<LeadershipEntry, "id"> = {
         name: addForm.name,
         role: addForm.role,

@@ -54,17 +54,17 @@ export function MatchRow({ game, schools }: MatchRowProps) {
           </span>
           <div className="flex items-center gap-3">
             {school ? (
-              <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center">
+              <div className="w-14 h-14 flex-shrink-0 flex items-center justify-center">
                 <Image
                   src={school.logo}
                   alt={school.name}
-                  width={40}
-                  height={40}
-                  className="object-contain max-h-10"
+                  width={56}
+                  height={56}
+                  className="object-contain max-h-14"
                 />
               </div>
             ) : (
-              <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-full bg-gray-200 text-gray-600 text-sm font-bold">
+              <div className="w-14 h-14 flex-shrink-0 flex items-center justify-center rounded-full bg-gray-200 text-gray-600 text-lg font-bold">
                 {game.opponent.charAt(0).toUpperCase()}
               </div>
             )}

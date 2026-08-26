@@ -87,7 +87,7 @@ export default function AdminCoachPage() {
     setError(null);
     try {
       let photoUrl = editForm.photoUrl || undefined;
-      if (editImageBlob) photoUrl = await uploadCoachPhoto(editImageBlob, "coach-photo.jpg");
+      if (editImageBlob) photoUrl = await uploadCoachPhoto(editImageBlob, "coach-photo.png");
       await saveCoach(editingId, { name: editForm.name, role: editForm.role, bio: editForm.bio || undefined, photoUrl });
       setEditingId(null);
       setEditImageBlob(null);
@@ -106,7 +106,7 @@ export default function AdminCoachPage() {
     setError(null);
     try {
       let photoUrl: string | undefined;
-      if (addImageBlob) photoUrl = await uploadCoachPhoto(addImageBlob, "coach-photo.jpg");
+      if (addImageBlob) photoUrl = await uploadCoachPhoto(addImageBlob, "coach-photo.png");
       await saveCoach(null, { name: addForm.name, role: addForm.role, bio: addForm.bio || undefined, photoUrl });
       setAddForm(emptyForm);
       setAddImageBlob(null);

@@ -84,7 +84,7 @@ export default function AdminSchoolsPage() {
     setError(null);
     try {
       let logo = editPreview;
-      if (editLogoBlob) logo = await uploadSchoolLogo(editLogoBlob, "logo.jpg");
+      if (editLogoBlob) logo = await uploadSchoolLogo(editLogoBlob, "logo.png");
       await saveSchool(editingId, { name: editForm.name, location: editForm.location, logo });
       setEditingId(null);
       setEditLogoBlob(null);
@@ -103,7 +103,7 @@ export default function AdminSchoolsPage() {
     setError(null);
     try {
       let logo = "";
-      if (addLogoBlob) logo = await uploadSchoolLogo(addLogoBlob, "logo.jpg");
+      if (addLogoBlob) logo = await uploadSchoolLogo(addLogoBlob, "logo.png");
       await saveSchool(null, { name: addForm.name, location: addForm.location, logo });
       setShowAdd(false);
       setAddForm(emptyForm);
@@ -184,7 +184,7 @@ export default function AdminSchoolsPage() {
             <div className="flex items-center gap-3">
               {addPreview && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={addPreview} alt="preview" className="w-12 h-12 object-contain flex-shrink-0" />
+                <img src={addPreview} alt="preview" className="w-16 h-16 object-contain flex-shrink-0" />
               )}
               <input
                 ref={addFileRef}
@@ -230,7 +230,7 @@ export default function AdminSchoolsPage() {
                     <div className="flex items-center gap-3">
                       {editPreview && (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={editPreview} alt="preview" className="w-12 h-12 object-contain flex-shrink-0" />
+                        <img src={editPreview} alt="preview" className="w-16 h-16 object-contain flex-shrink-0" />
                       )}
                       <input
                         ref={editFileRef}
@@ -264,9 +264,9 @@ export default function AdminSchoolsPage() {
                 <div className="flex items-center gap-3 min-w-0">
                   {school.logo ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={school.logo} alt={school.name} className="w-9 h-9 object-contain flex-shrink-0" />
+                    <img src={school.logo} alt={school.name} className="w-10 h-10 object-contain flex-shrink-0" />
                   ) : (
-                    <div className="w-9 h-9 flex-shrink-0 flex items-center justify-center rounded-full bg-gray-200 text-gray-600 text-xs font-bold">
+                    <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-full bg-gray-200 text-gray-600 text-sm font-bold">
                       {school.name.charAt(0).toUpperCase()}
                     </div>
                   )}

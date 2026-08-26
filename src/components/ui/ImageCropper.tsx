@@ -55,7 +55,8 @@ export function ImageCropper({ src, onDone, onCancel }: {
   function endDrag() { dragRef.current = null; }
 
   function handleDone() {
-    canvasRef.current?.toBlob((blob) => { if (blob) onDone(blob); }, "image/jpeg", 0.92);
+    // PNG (not JPEG) so transparent logos don't get flattened to solid black.
+    canvasRef.current?.toBlob((blob) => { if (blob) onDone(blob); }, "image/png");
   }
 
   return (

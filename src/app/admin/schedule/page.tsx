@@ -109,7 +109,7 @@ function GameForm({ form, setForm, onSubmit, onCancel, label, saving, error, sch
                 className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 text-left transition-colors"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={s.logo} alt={s.name} className="w-7 h-7 object-contain flex-shrink-0" />
+                <img src={s.logo} alt={s.name} className="w-10 h-10 object-contain flex-shrink-0" />
                 <span className="text-sm text-gray-800">{s.name}</span>
               </button>
             ))}
@@ -347,6 +347,31 @@ export default function AdminSchedulePage() {
         </div>
       </div>
 
+      {!loading && schedule && !showAdd && (
+        <button
+          onClick={() => { setShowAdd(true); setEditingId(null); }}
+          className="bg-carleton-blue text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity mb-6"
+        >
+          + Add Game
+        </button>
+      )}
+
+      {!loading && schedule && showAdd && (
+        <div className="mb-6">
+          <GameForm
+            key="add"
+            form={addForm}
+            setForm={setAddForm}
+            onSubmit={handleAdd}
+            onCancel={() => { setShowAdd(false); setAddForm(emptyGame); }}
+            label="Add Game"
+            saving={saving}
+            error={error}
+            schools={schools}
+          />
+        </div>
+      )}
+
       {showNewSeason && (
         <form onSubmit={handleCreateSeason} className="flex gap-3 mb-6 bg-gray-50 border border-gray-200 rounded-xl p-4">
           <input
@@ -380,7 +405,7 @@ export default function AdminSchedulePage() {
       {!loading && schedule && (
         <>
           <div className="space-y-3 mb-6">
-            {games.length === 0 && <p className="text-gray-400 text-sm">No games yet. Add one below.</p>}
+            {games.length === 0 && <p className="text-gray-400 text-sm">No games yet. Add one above.</p>}
             {games.map((game) => {
               if (editingId === game.id) return (
                 <GameForm
@@ -405,7 +430,7 @@ export default function AdminSchedulePage() {
                     <div className="flex items-center gap-2 min-w-0">
                       {school && (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={school.logo} alt={school.name} className="w-7 h-7 object-contain flex-shrink-0" />
+                        <img src={school.logo} alt={school.name} className="w-10 h-10 object-contain flex-shrink-0" />
                       )}
                       <div className="min-w-0">
                         <p className="font-medium text-gray-900 truncate">vs. {game.opponent}</p>
@@ -425,27 +450,6 @@ export default function AdminSchedulePage() {
               );
             })}
           </div>
-
-          {showAdd ? (
-            <GameForm
-              key="add"
-              form={addForm}
-              setForm={setAddForm}
-              onSubmit={handleAdd}
-              onCancel={() => { setShowAdd(false); setAddForm(emptyGame); }}
-              label="Add Game"
-              saving={saving}
-              error={error}
-              schools={schools}
-            />
-          ) : (
-            <button
-              onClick={() => { setShowAdd(true); setEditingId(null); }}
-              className="bg-carleton-blue text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
-            >
-              + Add Game
-            </button>
-          )}
         </>
       )}
     </div>

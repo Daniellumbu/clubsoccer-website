@@ -507,7 +507,7 @@ export async function importRoster(fromRosterId: string, toSeason: string): Prom
 // --- Upload helpers ---
 
 // 15-second timeout guards against misconfigured Storage rules or network hangs.
-async function uploadPhoto(file: File | Blob, storagePath: string, fileName = "photo.jpg"): Promise<string> {
+async function uploadPhoto(file: File | Blob, storagePath: string, fileName = "photo.png"): Promise<string> {
   const name = file instanceof File ? file.name : fileName;
   const storageRef = ref(storage, `${storagePath}/${Date.now()}-${name}`);
   const upload = uploadBytes(storageRef, file).then(() => getDownloadURL(storageRef));
@@ -517,15 +517,15 @@ async function uploadPhoto(file: File | Blob, storagePath: string, fileName = "p
   return Promise.race([upload, timeout]);
 }
 
-export function uploadCoachPhoto(file: File | Blob, fileName = "photo.jpg"): Promise<string> {
+export function uploadCoachPhoto(file: File | Blob, fileName = "photo.png"): Promise<string> {
   return uploadPhoto(file, "coaches", fileName);
 }
 
-export function uploadLeaderPhoto(file: File | Blob, fileName = "photo.jpg"): Promise<string> {
+export function uploadLeaderPhoto(file: File | Blob, fileName = "photo.png"): Promise<string> {
   return uploadPhoto(file, "leaders", fileName);
 }
 
-export function uploadPlayerImage(file: File | Blob, rosterId: string, fileName = "photo.jpg"): Promise<string> {
+export function uploadPlayerImage(file: File | Blob, rosterId: string, fileName = "photo.png"): Promise<string> {
   return uploadPhoto(file, `players/${rosterId}`, fileName);
 }
 

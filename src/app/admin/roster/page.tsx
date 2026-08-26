@@ -102,7 +102,7 @@ export default function AdminRosterPage() {
     setError(null);
     try {
       let imageUrl = editForm.imageUrl || undefined;
-      if (editImageBlob) imageUrl = await uploadPlayerImage(editImageBlob, selectedId, "player-photo.jpg");
+      if (editImageBlob) imageUrl = await uploadPlayerImage(editImageBlob, selectedId, "player-photo.png");
       const data: Omit<Player, "id"> = {
         name: editForm.name,
         number: Number(editForm.number),
@@ -129,7 +129,7 @@ export default function AdminRosterPage() {
     setError(null);
     try {
       let imageUrl: string | undefined;
-      if (addImageBlob) imageUrl = await uploadPlayerImage(addImageBlob, selectedId, "player-photo.jpg");
+      if (addImageBlob) imageUrl = await uploadPlayerImage(addImageBlob, selectedId, "player-photo.png");
       const data: Omit<Player, "id"> = {
         name: addForm.name,
         number: Number(addForm.number),

@@ -13,16 +13,6 @@ const ROLE_ORDER = [
   "Campus OutReach Manager",
 ];
 
-const ROLE_DESCRIPTIONS: Record<string, string> = {
-  "Club President": "Leads the club, oversees all operations, and serves as the primary point of contact with the college.",
-  "Club Vice President": "Supports the President and steps in as needed to keep the club running smoothly.",
-  "Club Treasurer": "Manages club finances, dues collection, and budget planning.",
-  "Captain": "Helps with scheduling games and finalizing game rosters. Runs practice and coordinates with Social Captains to keep camaraderie high.",
-  "Social Captain": "Plans team social events, builds team culture, and keeps morale strong on and off the field.",
-  "Freshman Liaison": "Bridges new members with the rest of the club and helps freshmen feel at home.",
-  "Campus OutReach Manager": "Promotes the club across campus and coordinates recruitment and community engagement.",
-};
-
 function roleIndex(role: string) {
   const i = ROLE_ORDER.indexOf(role);
   return i === -1 ? ROLE_ORDER.length : i;
@@ -106,9 +96,6 @@ export default function LeadershipPage() {
           <div key={role} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
             <div className="mb-4">
               <h2 className="text-lg font-bold text-carleton-blue">{role}</h2>
-              {ROLE_DESCRIPTIONS[role] && (
-                <p className="text-sm text-gray-400 mt-1 leading-relaxed">{ROLE_DESCRIPTIONS[role]}</p>
-              )}
             </div>
             <div className="space-y-3">
               {grouped[role].map((entry) => (
